@@ -639,6 +639,13 @@ def create_app():
         flash('Proje silindi.', 'success')
         return redirect(url_for('admin_projects'))
 
+    @app.route('/admin/studio/<int:id>')
+    @login_required
+    def studio_detail(id):
+        admin = Kullanici.query.first()
+        proje = StudioProject.query.get_or_404(id)
+        return render_template('studio_detail.html', admin=admin, proje=proje)
+
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
     def admin_skills():
