@@ -467,6 +467,21 @@ def create_app():
         flash('Kitap başarıyla eklendi.', 'success')
         return redirect(url_for('admin_books'))
 
+    @app.route('/admin/books/update/<int:id>', methods=['POST'])
+    @login_required
+    def update_book(id):
+        kitap = Kitap.query.get_or_404(id)
+        kitap.kitap_adi = request.json.get('kitap_adi', kitap.kitap_adi)
+        kitap.yazar = request.json.get('yazar', kitap.yazar)
+        kitap.sayfa_sayisi = request.json.get('sayfa_sayisi', kitap.sayfa_sayisi)
+        
+        okunma_tarihi_str = request.json.get('okunma_tarihi')
+        if okunma_tarihi_str:
+            kitap.okunma_tarihi = datetime.strptime(okunma_tarihi_str, '%Y-%m-%d')
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Kitap başarıyla güncellendi'})
+
     @app.route('/admin/books/delete/<int:id>')
     @login_required
     def delete_book(id):

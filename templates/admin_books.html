@@ -61,27 +61,34 @@
     <!-- Books Table -->
     <div class="bg-slate-800/50 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table id="booksTable" class="w-full text-left">
                 <thead>
                     <tr class="bg-slate-800/80 border-b border-slate-700">
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">#</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kitap Adı</th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Yazar</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Sayfa</th>
-                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Okunma Tarihi</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-violet-400 transition-colors" onclick="sortTable('sayfa')">
+                            Sayfa <i class="fas fa-sort text-xs ml-1"></i>
+                        </th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider cursor-pointer hover:text-violet-400 transition-colors" onclick="sortTable('tarih')">
+                            Okunma Tarihi <i class="fas fa-sort text-xs ml-1"></i>
+                        </th>
                         <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlem</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800">
                     {% for book in books %}
-                    <tr class="hover:bg-slate-800/50 transition-colors">
+                    <tr class="hover:bg-slate-800/50 transition-colors" data-book-id="{{ book.id }}">
                         <td class="px-6 py-4 text-slate-500 font-mono text-sm">{{ loop.index }}</td>
                         <td class="px-6 py-4 text-white font-medium">{{ book.kitap_adi }}</td>
                         <td class="px-6 py-4 text-slate-400">{{ book.yazar or '-' }}</td>
-                        <td class="px-6 py-4 text-slate-400">{{ book.sayfa_sayisi or '-' }}</td>
-                        <td class="px-6 py-4 text-slate-400 text-sm">{{ book.okunma_tarihi.strftime('%d.%m.%Y') if book.okunma_tarihi else '-' }}</td>
-                        <td class="px-6 py-4 text-right">
-                            <a href="{{ url_for('delete_book', id=book.id) }}" onclick="return confirm('Bu kitabı silmek istediğinize emin misiniz?')" class="text-slate-500 hover:text-red-500 transition-colors p-2">
+                        <td class="px-6 py-4 text-slate-400" data-sayfa="{{ book.sayfa_sayisi or 0 }}">{{ book.sayfa_sayisi or '-' }}</td>
+                        <td class="px-6 py-4 text-slate-400 text-sm" data-date="{{ book.okunma_tarihi.strftime('%Y-%m-%d') if book.okunma_tarihi else '' }}">{{ book.okunma_tarihi.strftime('%d.%m.%Y') if book.okunma_tarihi else '-' }}</td>
+                        <td class="px-6 py-4 text-right flex justify-end gap-2">
+                            <button onclick="openEditModal({{ book.id }}, '{{ book.kitap_adi }}', '{{ book.yazar or '' }}', {{ book.sayfa_sayisi or 0 }}, '{{ book.okunma_tarihi.strftime('%Y-%m-%d') if book.okunma_tarihi else '' }}')" class="text-slate-500 hover:text-blue-400 transition-colors p-2 rounded hover:bg-slate-700/30">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <a href="{{ url_for('delete_book', id=book.id) }}" onclick="return confirm('Bu kitabı silmek istediğinize emin misiniz?')" class="text-slate-500 hover:text-red-500 transition-colors p-2 rounded hover:bg-slate-700/30">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </td>
@@ -134,14 +141,123 @@
     </div>
 </div>
 
+<!-- Edit Book Modal -->
+<div id="edit-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white">Kitabı Düzenle</h3>
+            <button onclick="closeEditModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form id="editForm" class="p-6 space-y-4" onsubmit="submitEditForm(event)">
+            <input type="hidden" id="editBookId">
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Kitap Adı</label>
+                <input type="text" id="editKitapAdi" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Yazar</label>
+                <input type="text" id="editYazar" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Sayfa Sayısı</label>
+                    <input type="number" id="editSayfaSayisi" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Okunma Tarihi</label>
+                    <input type="date" id="editOkunmaTarihi" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeEditModal()" class="flex-1 py-3 text-slate-400 hover:text-white transition-all">Vazgeç</button>
+                <button type="submit" class="flex-1 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20">Güncelle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
+    let sortOrder = { sayfa: 'asc', tarih: 'asc' };
+
     function openModal() {
         document.getElementById('add-modal').classList.remove('hidden');
     }
+    
     function closeModal() {
         document.getElementById('add-modal').classList.add('hidden');
     }
+
+    function openEditModal(id, kitapAdi, yazar, sayfaSayisi, okunmaTarihi) {
+        document.getElementById('editBookId').value = id;
+        document.getElementById('editKitapAdi').value = kitapAdi;
+        document.getElementById('editYazar').value = yazar;
+        document.getElementById('editSayfaSayisi').value = sayfaSayisi;
+        document.getElementById('editOkunmaTarihi').value = okunmaTarihi;
+        document.getElementById('edit-modal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+        document.getElementById('edit-modal').classList.add('hidden');
+    }
+
+    function submitEditForm(event) {
+        event.preventDefault();
+        
+        const id = document.getElementById('editBookId').value;
+        const data = {
+            kitap_adi: document.getElementById('editKitapAdi').value,
+            yazar: document.getElementById('editYazar').value,
+            sayfa_sayisi: document.getElementById('editSayfaSayisi').value,
+            okunma_tarihi: document.getElementById('editOkunmaTarihi').value
+        };
+
+        fetch(`/admin/books/update/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                closeEditModal();
+                setTimeout(() => location.reload(), 300);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function sortTable(column) {
+        const table = document.getElementById('booksTable');
+        const rows = Array.from(table.querySelectorAll('tbody tr'));
+        
+        const isAsc = sortOrder[column] === 'asc';
+        sortOrder[column] = isAsc ? 'desc' : 'asc';
+
+        rows.sort((a, b) => {
+            let aVal, bVal;
+            
+            if (column === 'sayfa') {
+                aVal = parseInt(a.querySelector('[data-sayfa]').dataset.sayfa) || 0;
+                bVal = parseInt(b.querySelector('[data-sayfa]').dataset.sayfa) || 0;
+            } else if (column === 'tarih') {
+                aVal = a.querySelector('[data-date]').dataset.date || '';
+                bVal = b.querySelector('[data-date]').dataset.date || '';
+                aVal = aVal ? new Date(aVal) : new Date(0);
+                bVal = bVal ? new Date(bVal) : new Date(0);
+            }
+
+            return isAsc ? aVal - bVal : bVal - aVal;
+        });
+
+        const tbody = table.querySelector('tbody');
+        rows.forEach(row => tbody.appendChild(row));
+    }
 </script>
+
 <style>
     .no-scrollbar::-webkit-scrollbar {
         display: none;
