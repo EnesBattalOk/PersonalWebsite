@@ -368,6 +368,120 @@ def create_app():
         flash('Görev silindi.', 'success')
         return redirect(url_for('admin_planner'))
 
+    @app.route('/admin/diaries')
+    @login_required
+    def admin_diaries():
+        gunlukler = Gunluk.query.filter_by(tur='GUNLUK').order_by(Gunluk.tarih.desc()).all()
+        yilliklar = Gunluk.query.filter_by(tur='YILLIK').order_by(Gunluk.tarih.desc()).all()
+        return render_template('admin_diaries.html', gunlukler=gunlukler, yilliklar=yilliklar)
+
+    @app.route('/admin/diaries/add', methods=['POST'])
+    @login_required
+    def add_diary():
+        tur = request.form.get('tur')
+        baslik = request.form.get('baslik')
+        icerik = request.form.get('icerik')
+        duygu = request.form.get('duygu') if tur == 'GUNLUK' else None
+        yeni_kayit = Gunluk(baslik=baslik, icerik=icerik, tur=tur, duygu=duygu, tarih=datetime.utcnow())
+        db.session.add(yeni_kayit)
+        db.session.commit()
+        flash('Yeni kayıt başarıyla eklendi.', 'success')
+        return redirect(url_for('admin_diaries'))
+
+    @app.route('/admin/diaries/update/<int:id>', methods=['POST'])
+    @login_required
+    def update_diary(id):
+        gunluk = Gunluk.query.get_or_404(id)
+        data = request.get_json()
+        gunluk.baslik = data.get('baslik', gunluk.baslik)
+        gunluk.icerik = data.get('icerik', gunluk.icerik)
+        if gunluk.tur == 'GUNLUK':
+            gunluk.duygu = data.get('duygu', gunluk.duygu)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Kayıt başarıyla güncellendi'})
+
+    @app.route('/admin/diaries/delete/<int:id>')
+    @login_required
+    def delete_diary(id):
+        gunluk = Gunluk.query.get_or_404(id)
+        db.session.delete(gunluk)
+        db.session.commit()
+        flash('Kayıt silindi.', 'success')
+        return redirect(url_for('admin_diaries'))
+
+    @app.route('/admin/books')
+    @login_required
+    def admin_books():
+        secili_yil = request.args.get('yil')
+        yillar_query = db.session.query(extract('year', Kitap.okunma_tarihi)).filter(Kitap.okunma_tarihi.isnot(None)).distinct().all()
+        yillar = sorted([int(y[0]) for y in yillar_query if y[0] is not None], reverse=True)
+        query = Kitap.query
+        if secili_yil and secili_yil != 'genel':
+            query = query.filter(extract('year', Kitap.okunma_tarihi) == int(secili_yil))
+            secili_yil_display = secili_yil
+        else:
+            secili_yil_display = 'Genel'
+            secili_yil = 'genel'
+        kitaplar = query.order_by(Kitap.okunma_tarihi.desc()).all()
+        toplam_kitap = len(kitaplar)
+        toplam_sayfa = sum(kitap.sayfa_sayisi for kitap in kitaplar if kitap.sayfa_sayisi)
+        toplam_yazar = len(set([kitap.yazar for kitap in kitaplar if kitap.yazar]))
+        return render_template('admin_books.html', books=kitaplar, toplam_kitap=toplam_kitap, toplam_sayfa=toplam_sayfa, toplam_yazar=toplam_yazar, yillar=yillar, secili_yil=secili_yil, secili_yil_display=secili_yil_display)
+
+    @app.route('/admin/books/add', methods=['POST'])
+    @login_required
+    def add_book():
+        okunma_tarihi_str = request.form.get('okunma_tarihi')
+        okunma_tarihi = datetime.strptime(okunma_tarihi_str, '%Y-%m-%d') if okunma_tarihi_str else None
+        yeni_kitap = Kitap(kitap_adi=request.form.get('kitap_adi'), yazar=request.form.get('yazar'), sayfa_sayisi=int(request.form.get('sayfa_sayisi') or 0), okunma_tarihi=okunma_tarihi)
+        db.session.add(yeni_kitap)
+        db.session.commit()
+        flash('Kitap eklendi.', 'success')
+        return redirect(url_for('admin_books'))
+
+    @app.route('/admin/books/delete/<int:id>')
+    @login_required
+    def delete_book(id):
+        kitap = Kitap.query.get_or_404(id)
+        db.session.delete(kitap)
+        db.session.commit()
+        flash('Kitap silindi.', 'success')
+        return redirect(url_for('admin_books'))
+
+    @app.route('/admin/ideas')
+    @login_required
+    def admin_ideas():
+        fikirler = ProjeFikri.query.filter_by(durum='FIKIR').order_by(ProjeFikri.olusturma_tarihi.desc()).all()
+        aktif_projeler = ProjeFikri.query.filter_by(durum='AKTIF').order_by(ProjeFikri.baslangic_tarihi.desc()).all()
+        for proje in aktif_projeler:
+            toplam = len(proje.gorevler)
+            biten = len([g for g in proje.gorevler if g.durum == 'BITTI'])
+            proje.ilerleme_yuzde = (biten / toplam * 100) if toplam > 0 else 0
+        biten_projeler = ProjeFikri.query.filter_by(durum='BITTI').order_by(ProjeFikri.bitis_tarihi.desc()).all()
+        return render_template('admin_ideas.html', fikirler=fikirler, aktif_projeler=aktif_projeler, biten_projeler=biten_projeler, now=datetime.now())
+
+    @app.route('/admin/ideas/add', methods=['POST'])
+    @login_required
+    def add_idea():
+        yeni_fikir = ProjeFikri(baslik=request.form.get('baslik'), ozet=request.form.get('ozet'), detay=request.form.get('detay'), sorun=request.form.get('sorun'), teknolojiler=request.form.get('teknolojiler'), durum='FIKIR')
+        db.session.add(yeni_fikir)
+        db.session.commit()
+        flash('Fikir eklendi.', 'success')
+        return redirect(url_for('admin_ideas'))
+
+    @app.route('/admin/ideas/start/<int:id>', methods=['POST'])
+    @login_required
+    def start_idea(id):
+        fikir = ProjeFikri.query.get_or_404(id)
+        fikir.durum = 'AKTIF'
+        if request.form.get('baslangic_tarihi'):
+            fikir.baslangic_tarihi = datetime.strptime(request.form.get('baslangic_tarihi'), '%Y-%m-%d')
+        if request.form.get('bitis_tarihi'):
+            fikir.bitis_tarihi = datetime.strptime(request.form.get('bitis_tarihi'), '%Y-%m-%d')
+        db.session.commit()
+        flash('Proje başlatıldı.', 'success')
+        return redirect(url_for('admin_ideas'))
+
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
     def admin_skills():
