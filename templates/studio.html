@@ -55,14 +55,22 @@
             </div>
             <div style="margin-bottom:15px;">
                 <label style="display:block; color:#e2e8f0; margin-bottom:5px; font-weight:bold;">Kategori</label>
-                <select name="category" required style="width:100%; padding:10px; background:#0f172a; color:white; border:2px solid #334155; border-radius:6px; font-size:14px;">
-                    <option value="">Seçiniz...</option>
-                    <option value="Web">Web</option>
-                    <option value="Mobil">Mobil</option>
-                    <option value="IoT">IoT / Donanım</option>
-                    <option value="Masaüstü">Masaüstü</option>
-                    <option value="Diğer">Diğer</option>
-                </select>
+                <input 
+                    type="text" 
+                    name="category" 
+                    list="categoryList" 
+                    placeholder="Örn: Web, Mobil, IoT, Masaüstü..."
+                    required 
+                    style="width:100%; padding:10px; background:#0f172a; color:white; border:2px solid #334155; border-radius:6px; font-size:14px;"
+                />
+                <datalist id="categoryList">
+                    <option value="Web"></option>
+                    <option value="Mobil"></option>
+                    <option value="IoT / Donanım"></option>
+                    <option value="Masaüstü"></option>
+                    <option value="Oyun"></option>
+                    <option value="Diğer"></option>
+                </datalist>
             </div>
             <button type="submit" style="width:100%; padding:12px; background:#7c3aed; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-size:15px;">Ekle</button>
         </form>
