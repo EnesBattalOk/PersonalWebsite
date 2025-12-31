@@ -15,7 +15,7 @@
         <form action="{{ url_for('edit_resume', id=item.id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             <div>
                 <label class="block text-sm font-medium text-slate-400 mb-2">Tip</label>
-                <select name="tip" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+                <select name="tip" id="typeSelect" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
                     <option value="Egitim" {% if item.tip == 'Egitim' %}selected{% endif %}>Eğitim</option>
                     <option value="Deneyim" {% if item.tip == 'Deneyim' %}selected{% endif %}>Deneyim</option>
                 </select>
@@ -37,14 +37,13 @@
                 <label class="block text-sm font-medium text-slate-400 mb-2">Sıralama</label>
                 <input type="number" name="order_index" value="{{ item.order_index or 1 }}" min="1" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
             </div>
-            <div id="position_field" class="{% if item.tip == 'Egitim' %}hidden{% endif %}">
-                <label class="block text-sm font-medium text-slate-400 mb-2">Pozisyon / Bölüm</label>
-                <input type="text" name="position" value="{{ item.position or '' }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+
+            <!-- Dynamic Input Area -->
+            <div id="dynamic_field_container">
+                <label id="dynamic_label" class="block text-sm font-medium text-slate-400 mb-2">Derece / Pozisyon</label>
+                <input type="text" id="dynamic_input" name="degree" value="{{ item.degree if item.tip == 'Egitim' else item.position }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
             </div>
-            <div id="degree_field" class="{% if item.tip != 'Egitim' %}hidden{% endif %}">
-                <label class="block text-sm font-medium text-slate-400 mb-2">Eğitim Derecesi (Örn: Lisans, Önlisans)</label>
-                <input type="text" name="degree" value="{{ item.degree or '' }}" placeholder="Örn: Lisans" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
-            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Başlangıç Tarihi</label>
@@ -62,10 +61,6 @@
                     <span class="ml-3 text-sm font-medium text-slate-300">Devam Ediyor</span>
                 </label>
             </div>
-            <div class="hidden">
-                <label class="block text-sm font-medium text-slate-400 mb-2">Tarih Aralığı (Eski)</label>
-                <input type="text" name="tarih_araligi" value="{{ item.tarih_araligi or '' }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
-            </div>
             <div>
                 <label class="block text-sm font-medium text-slate-400 mb-2">Açıklama</label>
                 <textarea name="notlar" rows="4" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none resize-none">{{ item.notlar or '' }}</textarea>
@@ -81,27 +76,22 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tipSelect = document.querySelector('select[name="tip"]');
-        const positionField = document.getElementById('position_field');
-        const degreeField = document.getElementById('degree_field');
+        const typeSelect = document.getElementById('typeSelect');
+        const dynamicLabel = document.getElementById('dynamic_label');
+        const dynamicInput = document.getElementById('dynamic_input');
 
-        function toggleFields() {
-            if (!tipSelect) return;
-            if (tipSelect.value === 'Egitim') {
-                positionField.classList.add('hidden');
-                positionField.querySelector('input').value = '';
-                degreeField.classList.remove('hidden');
+        function updateFields() {
+            if (typeSelect.value === 'Egitim') {
+                dynamicLabel.innerText = "Eğitim Derecesi (Örn: Lisans)";
+                dynamicInput.name = "degree";
             } else {
-                positionField.classList.remove('hidden');
-                degreeField.classList.add('hidden');
-                degreeField.querySelector('input').value = '';
+                dynamicLabel.innerText = "Pozisyon / Unvan (Örn: Senior Developer)";
+                dynamicInput.name = "position";
             }
         }
 
-        if (tipSelect) {
-            tipSelect.addEventListener('change', toggleFields);
-            // Don't clear on initial load for edit page
-        }
+        typeSelect.addEventListener('change', updateFields);
+        updateFields();
     });
 </script>
 {% endblock %}

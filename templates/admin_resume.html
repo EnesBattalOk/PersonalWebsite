@@ -11,7 +11,7 @@
             <form action="{{ url_for('admin_resume') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Tip</label>
-                    <select name="tip" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+                    <select name="tip" id="typeSelect" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
                         <option value="Egitim">Eğitim</option>
                         <option value="Deneyim">Deneyim</option>
                     </select>
@@ -28,14 +28,13 @@
                     <label class="block text-sm font-medium text-slate-400 mb-2">Sıralama (Küçükten Büyüğe)</label>
                     <input type="number" name="order_index" value="1" min="1" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
                 </div>
-                <div id="position_field" class="hidden">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Pozisyon / Bölüm</label>
-                    <input type="text" name="position" placeholder="Örn: Senior Developer" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+                
+                <!-- Dynamic Input Area -->
+                <div id="dynamic_field_container">
+                    <label id="dynamic_label" class="block text-sm font-medium text-slate-400 mb-2">Eğitim Derecesi (Örn: Lisans)</label>
+                    <input type="text" id="dynamic_input" name="degree" placeholder="Örn: Lisans" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
                 </div>
-                <div id="degree_field">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Eğitim Derecesi (Örn: Lisans, Önlisans)</label>
-                    <input type="text" name="degree" placeholder="Örn: Lisans" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
-                </div>
+
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-slate-400 mb-2">Başlangıç Tarihi</label>
@@ -52,10 +51,6 @@
                         <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-violet-600"></div>
                         <span class="ml-3 text-sm font-medium text-slate-300">Devam Ediyor</span>
                     </label>
-                </div>
-                <div class="hidden">
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Tarih Aralığı (Eski)</label>
-                    <input type="text" name="tarih_araligi" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-slate-400 mb-2">Açıklama</label>
@@ -81,7 +76,6 @@
                     <div>
                         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded {% if item.tip == 'Egitim' %}bg-violet-500/10 text-violet-400{% else %}bg-emerald-500/10 text-emerald-400{% endif %}">{{ item.tip }}</span>
                         <h3 class="text-lg font-bold text-white mt-2">{{ item.baslik }}</h3>
-                        <p class="text-slate-400 text-sm">{{ item.tarih_araligi }}</p>
                     </div>
                 </div>
                 <div class="flex gap-2">
@@ -98,27 +92,24 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tipSelect = document.querySelector('select[name="tip"]');
-        const positionField = document.getElementById('position_field');
-        const degreeField = document.getElementById('degree_field');
+        const typeSelect = document.getElementById('typeSelect');
+        const dynamicLabel = document.getElementById('dynamic_label');
+        const dynamicInput = document.getElementById('dynamic_input');
 
-        function toggleFields() {
-            if (!tipSelect) return;
-            if (tipSelect.value === 'Egitim') {
-                positionField.classList.add('hidden');
-                positionField.querySelector('input').value = '';
-                degreeField.classList.remove('hidden');
+        function updateFields() {
+            if (typeSelect.value === 'Egitim') {
+                dynamicLabel.innerText = "Eğitim Derecesi (Örn: Lisans)";
+                dynamicInput.name = "degree";
+                dynamicInput.placeholder = "Örn: Lisans";
             } else {
-                positionField.classList.remove('hidden');
-                degreeField.classList.add('hidden');
-                degreeField.querySelector('input').value = '';
+                dynamicLabel.innerText = "Pozisyon / Unvan (Örn: Senior Developer)";
+                dynamicInput.name = "position";
+                dynamicInput.placeholder = "Örn: Senior Developer";
             }
         }
 
-        if (tipSelect) {
-            tipSelect.addEventListener('change', toggleFields);
-            toggleFields();
-        }
+        typeSelect.addEventListener('change', updateFields);
+        updateFields();
     });
 </script>
 {% endblock %}
