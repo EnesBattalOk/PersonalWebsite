@@ -54,9 +54,9 @@
         <div class="flex flex-wrap justify-center gap-8">
             {% for proje in projeler %}
             <div class="w-full md:w-[350px] group bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-violet-500 transition-all hover:-translate-y-2">
-                <div class="h-52 overflow-hidden bg-slate-900">
+                <div class="h-52 overflow-hidden bg-slate-900 flex items-center justify-center">
                     {% if proje.kapak_resmi %}
-                    <img src="{{ proje.kapak_resmi }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                    <img src="{{ proje.kapak_resmi }}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center text-slate-600"><i class="fa-solid fa-image text-3xl"></i></div>
                     {% endif %}
@@ -88,11 +88,10 @@
                 <div class="flex-1 min-w-0 text-left">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-violet-500/10 text-violet-400">{{ item.tip }}</span>
-                        {% if item.position %}
-                        <span class="text-sm text-slate-400 font-medium">{{ item.position }}</span>
-                        {% endif %}
                     </div>
-                    <h3 class="text-xl font-bold text-white mt-2">{{ item.baslik }}</h3>
+                    <h3 class="text-xl font-bold text-white mt-2">
+                        {{ item.baslik }}{% if item.degree %} - {{ item.degree }}{% endif %}
+                    </h3>
                     <p class="text-slate-400 text-sm break-all">
                         {% if item.start_date %}
                             {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
@@ -124,11 +123,10 @@
                 <div class="flex-1 min-w-0 text-left">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">{{ item.tip }}</span>
-                        {% if item.position %}
-                        <span class="text-sm text-slate-400 font-medium">{{ item.position }}</span>
-                        {% endif %}
                     </div>
-                    <h3 class="text-xl font-bold text-white mt-2">{{ item.baslik }}</h3>
+                    <h3 class="text-xl font-bold text-white mt-2">
+                        {{ item.baslik }}{% if item.position %} - {{ item.position }}{% endif %}
+                    </h3>
                     <p class="text-slate-400 text-sm break-all">
                         {% if item.start_date %}
                             {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
@@ -146,11 +144,11 @@
 
 <section id="iletisim" class="py-20 relative overflow-hidden">
     <div class="container mx-auto px-6">
-        <div class="flex flex-col lg:flex-row items-stretch gap-12 max-w-6xl mx-auto">
-            <div class="lg:w-1/3 flex flex-col">
+        <div class="flex flex-col lg:flex-row gap-12 max-w-6xl mx-auto">
+            <div class="lg:w-1/3">
                 <h2 class="text-3xl font-bold text-white mb-8">İletişime Geç</h2>
                 <p class="text-slate-400 mb-8">Projeleriniz için hazırım.</p>
-                <div class="space-y-4 flex-1">
+                <div class="space-y-4">
                     <!-- Email Card -->
                     <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-violet-500 transition-all flex items-start gap-4">
                         <i class="fas fa-envelope text-violet-500 text-xl flex-shrink-0 mt-1"></i>
@@ -213,21 +211,19 @@
                 </div>
             </div>
 
-            <div class="lg:w-2/3 w-full flex">
-                <form action="{{ url_for('contact') }}" method="POST" class="bg-slate-800 p-8 rounded-3xl border border-slate-700 w-full flex flex-col justify-between">
-                    <div class="space-y-6 flex-1">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <input type="text" name="ad_soyad" required placeholder="Ad Soyad" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
-                            <input type="email" name="email" required placeholder="E-Posta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
-                        </div>
-                        <div>
-                             <input type="text" name="konu" placeholder="Konu" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
-                        </div>
-                        <div class="h-full min-h-[150px] flex-1">
-                            <textarea name="mesaj" required placeholder="Mesajınız" class="w-full h-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none resize-none"></textarea>
-                        </div>
+            <div class="lg:w-2/3 w-full">
+                <form action="{{ url_for('contact') }}" method="POST" class="bg-slate-800 p-8 rounded-3xl border border-slate-700 w-full">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <input type="text" name="ad_soyad" required placeholder="Ad Soyad" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
+                        <input type="email" name="email" required placeholder="E-Posta" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
                     </div>
-                    <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl transition-all mt-6">Gönder</button>
+                    <div class="mb-6">
+                         <input type="text" name="konu" placeholder="Konu" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none">
+                    </div>
+                    <div class="mb-6">
+                        <textarea name="mesaj" required rows="4" placeholder="Mesajınız" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-5 py-4 text-white focus:border-violet-500 outline-none resize-none"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-bold py-4 rounded-xl transition-all">Gönder</button>
                 </form>
             </div>
         </div>

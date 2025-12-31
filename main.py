@@ -326,6 +326,7 @@ def create_app():
             end_date = request.form.get('end_date')
             is_active = 'is_active' in request.form
             position = request.form.get('position')
+            degree = request.form.get('degree')
             
             logo_url = None
             if 'logo' in request.files:
@@ -338,7 +339,7 @@ def create_app():
             yeni_item = YolHaritasi(
                 tip=tip, baslik=baslik, tarih_araligi=tarih_araligi, notlar=notlar, 
                 logo_url=logo_url, order_index=order_index, start_date=start_date,
-                end_date=end_date, is_active=is_active, position=position
+                end_date=end_date, is_active=is_active, position=position, degree=degree
             )
             db.session.add(yeni_item)
             db.session.commit()
@@ -362,6 +363,7 @@ def create_app():
             item.end_date = request.form.get('end_date')
             item.is_active = 'is_active' in request.form
             item.position = request.form.get('position')
+            item.degree = request.form.get('degree')
 
             if 'logo' in request.files:
                 file = request.files['logo']

@@ -53,6 +53,7 @@ class YolHaritasi(db.Model):
     end_date = db.Column(db.String(50))
     is_active = db.Column(db.Boolean, default=False)
     position = db.Column(db.String(100))
+    degree = db.Column(db.String(100)) # Yeni alan: Eğitim Derecesi
     
     kategori = db.relationship('CalismaKategori', backref=db.backref('yol_haritalari', lazy=True))
 
