@@ -150,3 +150,18 @@ class ProjeGorev(db.Model):
     baslangic_tarihi = db.Column(db.DateTime)
     durum = db.Column(db.String(50), default='BEKLIYOR') # 'BEKLIYOR', 'YAPILACAK', 'SURUYOR', 'BITTI'
     sira = db.Column(db.Integer, default=0) # Görev sırası
+
+class StudioProject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    category = db.Column(db.String(100), nullable=False) # 'Web', 'Mobil', 'IoT', 'Masaüstü' vb.
+    secure_data = db.Column(db.Text, default='') # Şifreler, API keyleri, notlar
+    olusturma_tarihi = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    work_logs = db.relationship('StudioWorkLog', backref=db.backref('proje', lazy=True), cascade='all, delete-orphan')
+
+class StudioWorkLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    proje_id = db.Column(db.Integer, db.ForeignKey('studio_project.id'), nullable=False)
+    note = db.Column(db.Text, nullable=False)
+    tarih = db.Column(db.DateTime, default=datetime.utcnow)

@@ -1,0 +1,126 @@
+{% extends "admin_base.html" %}
+
+{% block title %}{{ proje.name }} - Stüdyo{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="/admin/studio" class="text-violet-400 hover:text-violet-300 mb-4 inline-flex items-center gap-1">
+        <i class="fas fa-arrow-left"></i> Geri
+    </a>
+    <h1 class="text-4xl font-bold text-white mb-2">{{ proje.name }}</h1>
+    <p class="text-slate-400">
+        <span class="px-3 py-1 bg-violet-600/20 text-violet-300 rounded-full text-sm">{{ proje.category }}</span>
+        <span class="text-slate-500 ml-4">{{ proje.olusturma_tarihi.strftime('%d.%m.%Y') }}</span>
+    </p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- SOL SÜTUN: Kritik Bilgiler & Kasa -->
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-white">🔐 Kritik Bilgiler & Kasa</h2>
+            <button id="toggleSecureBtn" onclick="toggleSecureVisibility()" style="background:#7c3aed; color:white; border:none; padding:6px 10px; border-radius:5px; cursor:pointer; font-size:12px;">👁️ Göster</button>
+        </div>
+        <form id="secureForm" method="POST" action="/admin/studio/{{ proje.id }}/save_secure" onsubmit="saveSecure(event)">
+            <textarea 
+                id="secureData" 
+                name="secure_data" 
+                style="width:100%; height:300px; padding:12px; background:#0f172a; color:white; border:2px solid #334155; border-radius:6px; font-family:monospace; font-size:13px; resize:vertical; filter:blur(5px);"
+            >{{ proje.secure_data }}</textarea>
+            <button type="submit" style="width:100%; padding:10px; background:#10b981; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; margin-top:12px;">💾 Kaydet</button>
+        </form>
+    </div>
+
+    <!-- SAĞ SÜTUN: Proje Seyir Defteri -->
+    <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+        <h2 class="text-xl font-bold text-white mb-4">📔 Proje Seyir Defteri</h2>
+        
+        <!-- Not Ekleme Formu -->
+        <form id="logForm" onsubmit="addLog(event)" style="margin-bottom:20px;">
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <input 
+                    type="text" 
+                    id="logInput" 
+                    placeholder="Bugün ne üzerinde çalıştın?" 
+                    required
+                    style="flex-grow:1; padding:10px; background:#0f172a; color:white; border:2px solid #334155; border-radius:6px; font-size:14px;"
+                >
+                <button type="submit" style="padding:10px 16px; background:#7c3aed; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">Günlük Ekle</button>
+            </div>
+        </form>
+
+        <!-- Loglar Listesi (En yeni başta) -->
+        <div style="max-height:400px; overflow-y:auto;">
+            {% for log in logs %}
+            <div style="padding:12px; background:#0f172a; border-left:3px solid #7c3aed; border-radius:5px; margin-bottom:10px;">
+                <p style="color:#e2e8f0; margin:0 0 5px 0; word-wrap:break-word;">{{ log.note }}</p>
+                <p style="color:#64748b; font-size:12px; margin:0;">
+                    📅 {{ log.tarih.strftime('%d.%m.%Y %H:%M') }}
+                </p>
+            </div>
+            {% else %}
+            <p style="color:#64748b; text-align:center; padding:20px;">Henüz not eklenmedi.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+let secureVisible = false;
+
+function toggleSecureVisibility() {
+    const textarea = document.getElementById('secureData');
+    const btn = document.getElementById('toggleSecureBtn');
+    secureVisible = !secureVisible;
+    textarea.style.filter = secureVisible ? 'blur(0)' : 'blur(5px)';
+    btn.textContent = secureVisible ? '🙈 Gizle' : '👁️ Göster';
+}
+
+function saveSecure(e) {
+    e.preventDefault();
+    const form = document.getElementById('secureForm');
+    const formData = new FormData(form);
+    
+    fetch(`/admin/studio/{{ proje.id }}/save_secure`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('✅ Kritik bilgiler kaydedildi!');
+        }
+    })
+    .catch(err => console.error('Hata:', err));
+}
+
+function addLog(e) {
+    e.preventDefault();
+    const input = document.getElementById('logInput');
+    const not = input.value.trim();
+    
+    if (!not) return;
+    
+    const formData = new FormData();
+    formData.append('note', not);
+    
+    fetch(`/admin/studio/{{ proje.id }}/add_log`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            input.value = '';
+            location.reload();
+        }
+    })
+    .catch(err => console.error('Hata:', err));
+}
+
+// Başlangıçta Blur'u Kapat
+window.addEventListener('load', () => {
+    document.getElementById('secureData').style.filter = 'blur(5px)';
+});
+</script>
+{% endblock %}

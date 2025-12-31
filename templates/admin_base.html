@@ -76,6 +76,10 @@
                         <i class="fas fa-lightbulb w-5 text-slate-400 group-hover:text-violet-400"></i>
                         <span class="text-sm font-medium">Fikir Laboratuvarı</span>
                     </a>
+                    <a href="{{ url_for('admin_studio') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_studio') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-hammer w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Stüdyo</span>
+                    </a>
                 </div>
             </div>
 

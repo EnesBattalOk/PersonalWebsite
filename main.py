@@ -6,7 +6,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from extensions import db, login_manager
-from models import Kullanici, Gunluk, Varlik, YolHaritasi, Proje, Mesaj, Yetenek, Kitap, FinansIslem, Gorev, Ziyaretci, ProjeFikri, ProjeGorev
+from models import Kullanici, Gunluk, Varlik, YolHaritasi, Proje, Mesaj, Yetenek, Kitap, FinansIslem, Gorev, Ziyaretci, ProjeFikri, ProjeGorev, StudioProject, StudioWorkLog
 from datetime import datetime, date
 from sqlalchemy import func, extract
 
@@ -931,6 +931,58 @@ def create_app():
     def project_detail(id):
         proje = Proje.query.get_or_404(id)
         return render_template('project_detail.html', proje=proje)
+
+    @app.route('/admin/studio')
+    @login_required
+    def admin_studio():
+        """Stüdyo Projelerini Listele"""
+        projeler = StudioProject.query.order_by(StudioProject.olusturma_tarihi.desc()).all()
+        return render_template('studio.html', projeler=projeler)
+
+    @app.route('/admin/studio/add', methods=['POST'])
+    @login_required
+    def studio_add():
+        """Yeni Stüdyo Projesi Ekle"""
+        name = request.form.get('name')
+        category = request.form.get('category')
+        
+        yeni_proje = StudioProject(name=name, category=category)
+        db.session.add(yeni_proje)
+        db.session.commit()
+        flash('Proje başarıyla eklendi.', 'success')
+        return redirect(url_for('admin_studio'))
+
+    @app.route('/admin/studio/<int:id>')
+    @login_required
+    def studio_detail(id):
+        """Stüdyo Proje Detayı"""
+        proje = StudioProject.query.get_or_404(id)
+        logs = StudioWorkLog.query.filter_by(proje_id=id).order_by(StudioWorkLog.tarih.desc()).all()
+        return render_template('studio_detail.html', proje=proje, logs=logs)
+
+    @app.route('/admin/studio/<int:id>/save_secure', methods=['POST'])
+    @login_required
+    def studio_save_secure(id):
+        """Kritik Bilgileri Kaydet"""
+        proje = StudioProject.query.get_or_404(id)
+        proje.secure_data = request.form.get('secure_data', '')
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Kritik bilgiler kaydedildi'})
+
+    @app.route('/admin/studio/<int:id>/add_log', methods=['POST'])
+    @login_required
+    def studio_add_log(id):
+        """Proje Günlüğüne Not Ekle"""
+        proje = StudioProject.query.get_or_404(id)
+        not_metni = request.form.get('note', '')
+        
+        if not_metni.strip():
+            yeni_log = StudioWorkLog(proje_id=id, note=not_metni)
+            db.session.add(yeni_log)
+            db.session.commit()
+            return jsonify({'success': True, 'message': 'Not eklendi'})
+        
+        return jsonify({'success': False, 'error': 'Not boş olamaz'}), 400
 
     return app
 

@@ -1,0 +1,37 @@
+Projeme "Stüdyo" adında, ticari ve profesyonel işlerimi yöneteceğim yeni bir modül eklemek istiyorum. Sadece web projeleri değil; mobil, masaüstü veya donanım (IoT) projeleri de geliştirdiğim için yapı esnek olmalı.
+
+Lütfen aşağıdaki özelliklerde yeni bir sayfa ve veritabanı yapısı kur:
+
+1. **Veritabanı Modeli (DB):**
+   - `StudioProject` adında yeni bir tablo oluştur.
+   - Alanlar:
+     - `id`: Benzersiz kimlik.
+     - `name`: Proje Adı.
+     - `category`: Proje Türü (Örn: Web, Mobil, IoT, Masaüstü vb. - Dropdown veya text olabilir).
+     - `secure_data`: (Textarea/Text) Proje ile ilgili tüm hassas ve kritik bilgilerin tutulacağı alan (Şifreler, API Keyler, Pinout notları, Sunucu IP'leri vb.).
+     - `work_logs`: (İlişkisel veya JSON) Tarihli ilerleme notları.
+
+2. **Arayüz (Frontend - HTML/CSS):**
+   - Sol menüye "Stüdyo" adında, farklı bir ikona sahip bir link ekle.
+   - **Ana Sayfa (/studio):** Projeleri kartlar halinde listele. Her kartta projenin adı ve kategorisi (etiket gibi) görünsün.
+   - **Proje Detay Sayfası:**
+     Ekranı iki ana sütuna böl:
+     
+     **SOL SÜTUN: "Kritik Bilgiler & Kasa"**
+     - Burası projenin "Hafızası" olacak.
+     - İçinde geniş bir `textarea` olsun.
+     - Varsayılan olarak bu alanın içeriği "blurlu" (bulanık) veya yıldızlı (***) olsun.
+     - Yanına bir "Göz İkonu" (Toggle Visibility) koy. Tıklayınca blurluk kalksın ve notlar okunsun. (Güvenlik hissi için).
+     - Buraya şifreler, donanım notları, key'ler vb. yazılacak. "Kaydet" butonu olsun.
+     
+     **SAĞ SÜTUN: "Proje Seyir Defteri"**
+     - Projeye yapılan işlemleri tarih bazlı tutan bir akış.
+     - "Bugün ne üzerinde çalıştın?" input alanı.
+     - "Günlük Ekle" butonu.
+     - Altında: En yeniden eskiye doğru sıralanmış loglar (Örn: "31.12.2025 14:00 - Sensör kalibrasyonu yapıldı.").
+
+3. **Backend (Python/Flask):**
+   - Gerekli route'ları (/studio, /studio/<id>, /add_log vb.) ayarla.
+   - Log eklerken otomatik timestamp (zaman damgası) kullan.
+
+Tasarım modern, "Dark Mode" uyumlu ve profesyonel bir gösterge paneli (dashboard) havasında olsun.
