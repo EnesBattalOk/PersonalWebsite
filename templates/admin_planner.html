@@ -7,42 +7,42 @@
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
 
 <div class="space-y-8 pb-20">
-    <div class="flex justify-between items-center">
-        <div>
-            <h1 class="text-4xl font-bold text-white">Planlayıcı</h1>
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="text-center sm:text-left">
+            <h1 class="text-3xl sm:text-4xl font-bold text-white">Planlayıcı</h1>
             <p class="text-slate-400 mt-2">Görevlerini yönet, planını takip et.</p>
         </div>
-        <button onclick="toggleModal(true)" class="bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-violet-500/20">
+        <button onclick="toggleModal(true)" class="w-full sm:w-auto bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 shadow-lg shadow-violet-500/20">
             <i class="fas fa-plus"></i> Yeni Görev
         </button>
     </div>
 
     <!-- TAB BUTONLARI -->
-    <div class="flex gap-2 border-b border-slate-800 overflow-x-auto">
-        <button onclick="switchTab('gunluk')" class="tab-button active px-6 py-3 font-bold text-sm border-b-2 border-violet-500 text-violet-400">
+    <div class="flex gap-2 border-b border-slate-800 overflow-x-auto no-scrollbar">
+        <button onclick="switchTab('gunluk')" class="tab-button active px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 border-violet-500 text-violet-400 whitespace-nowrap">
             <i class="fas fa-calendar-day mr-2"></i> GÜNLÜK
         </button>
-        <button onclick="switchTab('haftalik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+        <button onclick="switchTab('haftalik')" class="tab-button px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300 whitespace-nowrap">
             <i class="fas fa-calendar-week mr-2"></i> HAFTALIK
         </button>
-        <button onclick="switchTab('aylik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+        <button onclick="switchTab('aylik')" class="tab-button px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300 whitespace-nowrap">
             <i class="fas fa-calendar-alt mr-2"></i> AYLIK
         </button>
-        <button onclick="switchTab('yillik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+        <button onclick="switchTab('yillik')" class="tab-button px-4 sm:px-6 py-3 font-bold text-xs sm:text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300 whitespace-nowrap">
             <i class="fas fa-chart-line mr-2"></i> YILLIK
         </button>
     </div>
 
     <!-- GÜNLÜK TAB -->
-    <div id="tab-gunluk" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div id="tab-gunluk" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         <div class="lg:col-span-2">
-            <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 max-h-[700px] overflow-y-auto">
-                <h2 class="text-xl font-bold text-white mb-6">Zaman Çizelgesi</h2>
+            <div class="bg-slate-800/30 p-4 sm:p-6 rounded-2xl border border-slate-700 max-h-[600px] sm:max-h-[700px] overflow-y-auto">
+                <h2 class="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6">Zaman Çizelgesi</h2>
                 <div class="space-y-3">
                     {% for hour in range(8, 24) %}
-                    <div class="flex items-start gap-4">
-                        <div class="w-12 pt-2 text-right">
-                            <span class="text-xs font-bold text-slate-500">{{ "%02d"|format(hour) }}:00</span>
+                    <div class="flex items-start gap-3 sm:gap-4">
+                        <div class="w-10 sm:w-12 pt-2 text-right">
+                            <span class="text-[10px] sm:text-xs font-bold text-slate-500">{{ "%02d"|format(hour) }}:00</span>
                         </div>
                         <div class="flex-1">
                             {% set gorev_for_hour = none %}
@@ -52,15 +52,15 @@
                                 {% endif %}
                             {% endfor %}
                             {% if gorev_for_hour %}
-                            <div class="bg-violet-600/20 border border-violet-500 p-3 rounded-lg flex items-start gap-3">
-                                <input type="checkbox" class="mt-1 w-4 h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev_for_hour.id }}" {% if gorev_for_hour.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
+                            <div class="bg-violet-600/20 border border-violet-500 p-2 sm:p-3 rounded-lg flex items-start gap-2 sm:gap-3">
+                                <input type="checkbox" class="mt-1 w-3.5 h-3.5 sm:w-4 sm:h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev_for_hour.id }}" {% if gorev_for_hour.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
                                 <div>
-                                    <p class="text-white font-semibold text-sm {% if gorev_for_hour.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev_for_hour.baslik }}</p>
-                                    <p class="text-slate-400 text-xs mt-1">{{ gorev_for_hour.saat }}</p>
+                                    <p class="text-white font-semibold text-xs sm:text-sm {% if gorev_for_hour.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev_for_hour.baslik }}</p>
+                                    <p class="text-slate-400 text-[10px] sm:text-xs mt-0.5 sm:mt-1">{{ gorev_for_hour.saat }}</p>
                                 </div>
                             </div>
                             {% else %}
-                            <div class="bg-slate-900/30 border border-dashed border-slate-700 h-10 rounded-lg"></div>
+                            <div class="bg-slate-900/30 border border-dashed border-slate-700 h-8 sm:h-10 rounded-lg"></div>
                             {% endif %}
                         </div>
                     </div>
@@ -70,30 +70,30 @@
         </div>
 
         <div>
-            <div class="bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-6 rounded-2xl border border-violet-500/30 sticky top-20">
+            <div class="bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-4 sm:p-6 rounded-2xl border border-violet-500/30 lg:sticky lg:top-20">
                 <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    <i class="fas fa-star text-yellow-400"></i> Günün Vizyonu
+                    <i class="fas fa-star text-yellow-400 text-sm sm:text-base"></i> Günün Vizyonu
                 </h3>
                 <div class="space-y-3">
                     {% if gunun_onemlileri %}
                         <div class="mb-4">
-                            <h4 class="text-xs font-bold text-slate-400 mb-2">Günlük İlerleme</h4>
-                            <div id="dailyProgress" class="h-3 bg-slate-900 rounded-full overflow-hidden">
+                            <h4 class="text-[10px] sm:text-xs font-bold text-slate-400 mb-2">Günlük İlerleme</h4>
+                            <div id="dailyProgress" class="h-2 sm:h-3 bg-slate-900 rounded-full overflow-hidden">
                                 <div id="dailyProgressBar" class="h-full bg-gradient-to-r from-violet-500 to-violet-600 transition-all duration-300" style="width: 0%"></div>
                             </div>
-                            <p id="dailyProgressText" class="text-slate-400 text-xs mt-1 text-center">%0</p>
+                            <p id="dailyProgressText" class="text-slate-400 text-[10px] sm:text-xs mt-1 text-center">%0</p>
                         </div>
                         {% for gorev in gunun_onemlileri[:3] %}
-                        <div class="bg-slate-900/50 p-3 rounded-lg border-l-4 border-yellow-500 flex items-start gap-2">
-                            <input type="checkbox" class="mt-0.5 w-4 h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev.id }}" {% if gorev.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
+                        <div class="bg-slate-900/50 p-2.5 sm:p-3 rounded-lg border-l-4 border-yellow-500 flex items-start gap-2">
+                            <input type="checkbox" class="mt-0.5 w-3.5 h-3.5 sm:w-4 sm:h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev.id }}" {% if gorev.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
                             <div>
-                                <p class="text-white font-semibold text-sm {% if gorev.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev.baslik }}</p>
-                                {% if gorev.saat %}<p class="text-slate-500 text-xs mt-1"><i class="fas fa-clock mr-1"></i> {{ gorev.saat }}</p>{% endif %}
+                                <p class="text-white font-semibold text-xs sm:text-sm {% if gorev.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev.baslik }}</p>
+                                {% if gorev.saat %}<p class="text-slate-500 text-[10px] mt-0.5"><i class="fas fa-clock mr-1"></i> {{ gorev.saat }}</p>{% endif %}
                             </div>
                         </div>
                         {% endfor %}
                     {% else %}
-                    <p class="text-slate-500 text-sm text-center py-8">Bugün için önemli iş yok</p>
+                    <p class="text-slate-500 text-xs sm:text-sm text-center py-6 sm:py-8">Bugün için önemli iş yok</p>
                     {% endif %}
                 </div>
             </div>
@@ -102,7 +102,7 @@
 
     <!-- HAFTALIK TAB -->
     <div id="tab-haftalik" class="tab-content hidden">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-3">
             {% set gunler = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'] %}
             {% for gun in gunler %}
             <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-700">
@@ -130,7 +130,7 @@
 
     <!-- YILLIK TAB -->
     <div id="tab-yillik" class="tab-content hidden">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div class="bg-gradient-to-br from-emerald-600/20 to-emerald-900/20 p-6 rounded-2xl border border-emerald-500/30">
                 <h3 class="text-2xl font-bold text-emerald-400 mb-4">🌱 Q1</h3>
                 <p class="text-slate-500 text-xs mb-4">Ocak - Mart</p>
@@ -262,6 +262,8 @@
 </div>
 
 <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     .fc { color: #e2e8f0; font-family: 'Outfit', sans-serif; }
     .fc-theme-standard td, .fc-theme-standard th { border-color: #1e293b; }
     .fc-daygrid-day { background-color: #0f172a; }

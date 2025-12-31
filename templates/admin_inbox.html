@@ -3,50 +3,51 @@
 {% block content %}
 <div class="pb-20">
     <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-white">Gelen Kutusu</h1>
-        <div class="text-slate-400 text-sm">
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">Gelen Kutusu</h1>
+        <div class="text-slate-400 text-xs sm:text-sm">
             Toplam {{ mesajlar|length }} mesaj
         </div>
     </div>
 
-    <div class="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden">
+    <div class="bg-slate-800/50 rounded-xl sm:rounded-2xl border border-slate-700 overflow-hidden">
         <div class="table-responsive">
             <table class="w-full text-left">
-                <thead class="bg-slate-900/50 text-slate-400 text-sm uppercase">
+                <thead class="bg-slate-900/50 text-slate-400 text-xs sm:text-sm uppercase">
                     <tr>
-                        <th class="px-6 py-4 font-medium">Durum</th>
-                        <th class="px-6 py-4 font-medium">Gönderen</th>
-                        <th class="px-6 py-4 font-medium">Konu</th>
-                        <th class="px-6 py-4 font-medium">Tarih</th>
-                        <th class="px-6 py-4 font-medium">İşlemler</th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 font-medium">Durum</th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 font-medium">Gönderen</th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 font-medium">Konu</th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 font-medium hidden md:table-cell">Tarih</th>
+                        <th class="px-4 sm:px-6 py-3 sm:py-4 font-medium">İşlemler</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-700">
                     {% for mesaj in mesajlar %}
                     <tr class="hover:bg-slate-700/30 transition-colors {% if not mesaj.okundu_mu %}bg-violet-500/5{% endif %}">
-                        <td class="px-6 py-4">
+                        <td class="px-4 sm:px-6 py-3 sm:py-4">
                             {% if not mesaj.okundu_mu %}
                                 <span class="flex h-2 w-2 rounded-full bg-violet-500 shadow-[0_0_10px_rgba(124,58,237,0.8)]"></span>
                             {% else %}
                                 <span class="flex h-2 w-2 rounded-full bg-slate-600"></span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="text-white font-medium">{{ mesaj.gonderen_ad }}</div>
-                            <div class="text-slate-500 text-xs">{{ mesaj.gonderen_email }}</div>
+                        <td class="px-4 sm:px-6 py-3 sm:py-4">
+                            <div class="text-white font-medium text-sm sm:text-base">{{ mesaj.gonderen_ad }}</div>
+                            <div class="text-slate-500 text-[10px] sm:text-xs">{{ mesaj.gonderen_email }}</div>
                         </td>
-                        <td class="px-6 py-4 text-slate-300">
-                            {{ mesaj.konu or '(Konu Yok)' }}
+                        <td class="px-4 sm:px-6 py-3 sm:py-4 text-slate-300 text-sm">
+                            <div class="line-clamp-1">{{ mesaj.konu or '(Konu Yok)' }}</div>
+                            <div class="md:hidden text-slate-500 text-[10px] mt-1">{{ mesaj.tarih.strftime('%d.%m.%Y') }}</div>
                         </td>
-                        <td class="px-6 py-4 text-slate-400 text-sm">
+                        <td class="px-4 sm:px-6 py-3 sm:py-4 text-slate-400 text-xs sm:text-sm hidden md:table-cell">
                             {{ mesaj.tarih.strftime('%d.%m.%Y %H:%M') }}
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <a href="{{ url_for('read_message', id=mesaj.id) }}" class="text-violet-400 hover:text-violet-300 transition-colors" title="Oku">
+                        <td class="px-4 sm:px-6 py-3 sm:py-4">
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <a href="{{ url_for('read_message', id=mesaj.id) }}" class="text-violet-400 hover:text-violet-300 transition-colors p-1" title="Oku">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="{{ url_for('delete_message', id=mesaj.id) }}" class="text-slate-500 hover:text-red-500 transition-colors" title="Sil">
+                                <a href="{{ url_for('delete_message', id=mesaj.id) }}" class="text-slate-500 hover:text-red-500 transition-colors p-1" title="Sil">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </div>

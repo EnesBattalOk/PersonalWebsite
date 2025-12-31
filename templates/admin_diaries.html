@@ -5,9 +5,9 @@
 {% block content %}
 <div class="pb-20">
     <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-        <h1 class="text-3xl font-bold text-white">Günlük Kayıtlar</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-white">Günlük Kayıtlar</h1>
         <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <div class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700 w-full sm:w-auto">
+            <div class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700 w-full sm:w-auto overflow-x-auto no-scrollbar">
                 <button onclick="switchTab('gunluk')" id="tab-btn-gunluk" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all bg-violet-600 text-white shadow-lg shadow-violet-500/20">
                     Günlük Notlar
                 </button>
@@ -23,7 +23,7 @@
 
     <!-- Günlük Notlar Sekmesi -->
     <div id="tab-gunluk" class="tab-content">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {% for gunluk in gunlukler %}
             {% set border_color = 'border-slate-700' %}
             {% if gunluk.duygu == 'harika' %}{% set border_color = 'border-yellow-400' %}
@@ -32,31 +32,31 @@
             {% elif gunluk.duygu == 'kotu' %}{% set border_color = 'border-red-500' %}
             {% endif %}
             
-            <div class="bg-slate-800/40 border-2 {{ border_color }} rounded-2xl p-6 hover:transform hover:scale-[1.02] transition-all shadow-xl group relative overflow-hidden flex flex-col h-full">
-                <div class="flex justify-between items-start mb-4">
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">{{ gunluk.tarih.strftime('%d %B %Y') }}</span>
-                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div class="bg-slate-800/40 border-2 {{ border_color }} rounded-2xl p-4 sm:p-6 hover:transform hover:scale-[1.02] transition-all shadow-xl group relative overflow-hidden flex flex-col h-full">
+                <div class="flex justify-between items-start mb-3 sm:mb-4">
+                    <span class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-widest">{{ gunluk.tarih.strftime('%d %B %Y') }}</span>
+                    <div class="flex items-center gap-2 opacity-0 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onclick="openEditDailyModal({{ gunluk.id }}, '{{ gunluk.baslik }}', '{{ gunluk.icerik|replace("'", "\\'") }}', '{{ gunluk.duygu or '' }}')" class="text-slate-600 hover:text-blue-400 transition-colors p-1">
-                            <i class="fas fa-pen"></i>
+                            <i class="fas fa-pen text-xs sm:text-sm"></i>
                         </button>
                         <a href="{{ url_for('delete_diary', id=gunluk.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-1">
-                            <i class="fas fa-trash-alt"></i>
+                            <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
                         </a>
                     </div>
                 </div>
-                <h3 class="text-lg font-bold text-white mb-2">{{ gunluk.baslik }}</h3>
-                <div class="text-slate-400 text-sm flex-grow mb-4 prose prose-invert prose-sm max-w-none line-clamp-6">
+                <h3 class="text-base sm:text-lg font-bold text-white mb-2 line-clamp-2">{{ gunluk.baslik }}</h3>
+                <div class="text-slate-400 text-xs sm:text-sm flex-grow mb-4 prose prose-invert prose-sm max-w-none line-clamp-4 sm:line-clamp-6">
                     {{ gunluk.icerik|safe }}
                 </div>
-                <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-700/50">
+                <div class="flex items-center justify-between mt-auto pt-3 sm:pt-4 border-t border-slate-700/50">
                     <div class="flex items-center gap-2">
                         {% if gunluk.duygu %}
-                        <span class="w-2 h-2 rounded-full 
+                        <span class="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full 
                             {% if gunluk.duygu == 'harika' %}bg-yellow-400
                             {% elif gunluk.duygu == 'iyi' %}bg-violet-500
                             {% elif gunluk.duygu == 'orta' %}bg-blue-400
                             {% else %}bg-red-500{% endif %}"></span>
-                        <span class="text-[10px] font-bold text-slate-500 uppercase">
+                        <span class="text-[8px] sm:text-[10px] font-bold text-slate-500 uppercase">
                             {% if gunluk.duygu == 'harika' %}🌟 Harika
                             {% elif gunluk.duygu == 'iyi' %}💜 İyi
                             {% elif gunluk.duygu == 'orta' %}🔵 Orta
@@ -79,22 +79,24 @@
     <!-- Yıllık Kayıtlar Sekmesi -->
     <div id="tab-yillik" class="tab-content hidden space-y-4">
         {% for yillik in yilliklar %}
-        <div class="bg-slate-800/40 border border-slate-700 rounded-2xl p-6 flex items-center gap-8 hover:bg-slate-800/60 transition-all group">
-            <div class="text-4xl font-black text-slate-700 group-hover:text-violet-500/50 transition-colors">
+        <div class="bg-slate-800/40 border border-slate-700 rounded-2xl p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 hover:bg-slate-800/60 transition-all group">
+            <div class="text-3xl sm:text-4xl font-black text-slate-700 group-hover:text-violet-500/50 transition-colors">
                 {{ yillik.tarih.strftime('%Y') }}
             </div>
-            <div class="flex-1">
-                <h3 class="text-xl font-bold text-white mb-1">{{ yillik.baslik }}</h3>
+            <div class="flex-1 w-full">
+                <h3 class="text-lg sm:text-xl font-bold text-white mb-1">{{ yillik.baslik }}</h3>
                 <div class="text-slate-400 text-sm line-clamp-1 italic">{{ yillik.icerik|safe }}</div>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-4 pt-4 sm:pt-0 border-t sm:border-t-0 border-slate-700/50">
                 <span class="text-xs font-medium text-slate-500">{{ yillik.tarih.strftime('%d.%m.%Y') }}</span>
-                <button onclick="openEditYearlyModal({{ yillik.id }}, '{{ yillik.baslik }}', '{{ yillik.icerik|replace("'", "\\'") }}')" class="text-slate-600 hover:text-blue-400 transition-colors p-2 rounded hover:bg-slate-700/30">
-                    <i class="fas fa-pen"></i>
-                </button>
-                <a href="{{ url_for('delete_diary', id=yillik.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-2 rounded hover:bg-slate-700/30">
-                    <i class="fas fa-trash-alt"></i>
-                </a>
+                <div class="flex items-center gap-2">
+                    <button onclick="openEditYearlyModal({{ yillik.id }}, '{{ yillik.baslik }}', '{{ yillik.icerik|replace("'", "\\'") }}')" class="text-slate-600 hover:text-blue-400 transition-colors p-2 rounded hover:bg-slate-700/30">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <a href="{{ url_for('delete_diary', id=yillik.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-2 rounded hover:bg-slate-700/30">
+                        <i class="fas fa-trash-alt"></i>
+                    </a>
+                </div>
             </div>
         </div>
         {% endfor %}
