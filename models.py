@@ -63,6 +63,10 @@ class Proje(db.Model):
     kapak_resmi = db.Column(db.String(255))
     detayli_icerik = db.Column(db.Text)
 
+    @property
+    def ilerleme_yuzde(self):
+        return 0
+
 class Kitap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     kitap_adi = db.Column(db.String(200), nullable=False)
