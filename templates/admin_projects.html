@@ -49,8 +49,19 @@
             <div>
                 <h3 class="text-xl font-bold text-white mb-2">{{ proje.baslik }}</h3>
                 <p class="text-slate-400 text-sm line-clamp-2 mb-4">{{ proje.notlar }}</p>
+                
+                <!-- İlerleme Çubuğu -->
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="text-xs font-bold text-slate-400">İlerleme</h4>
+                        <span class="text-xs font-bold text-violet-400">%{{ proje.ilerleme_yuzde|int }}</span>
+                    </div>
+                    <div class="h-2 bg-slate-900 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-violet-500 to-violet-600 transition-all duration-300" style="width: {{ proje.ilerleme_yuzde }}%"></div>
+                    </div>
+                </div>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 mt-6">
                 <a href="{{ url_for('edit_project', id=proje.id) }}" class="flex-1 text-center py-2 bg-violet-500/10 text-violet-400 rounded-lg hover:bg-violet-500 hover:text-white transition-all text-sm">Düzenle</a>
                 <a href="{{ url_for('delete_project', id=proje.id) }}" class="flex-1 text-center py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all text-sm">Sil</a>
             </div>

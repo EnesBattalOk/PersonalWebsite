@@ -52,9 +52,12 @@
                                 {% endif %}
                             {% endfor %}
                             {% if gorev_for_hour %}
-                            <div class="bg-violet-600/20 border border-violet-500 p-3 rounded-lg">
-                                <p class="text-white font-semibold text-sm">{{ gorev_for_hour.baslik }}</p>
-                                <p class="text-slate-400 text-xs mt-1">{{ gorev_for_hour.saat }}</p>
+                            <div class="bg-violet-600/20 border border-violet-500 p-3 rounded-lg flex items-start gap-3">
+                                <input type="checkbox" class="mt-1 w-4 h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev_for_hour.id }}" {% if gorev_for_hour.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
+                                <div>
+                                    <p class="text-white font-semibold text-sm {% if gorev_for_hour.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev_for_hour.baslik }}</p>
+                                    <p class="text-slate-400 text-xs mt-1">{{ gorev_for_hour.saat }}</p>
+                                </div>
                             </div>
                             {% else %}
                             <div class="bg-slate-900/30 border border-dashed border-slate-700 h-10 rounded-lg"></div>
@@ -73,10 +76,20 @@
                 </h3>
                 <div class="space-y-3">
                     {% if gunun_onemlileri %}
+                        <div class="mb-4">
+                            <h4 class="text-xs font-bold text-slate-400 mb-2">Günlük İlerleme</h4>
+                            <div id="dailyProgress" class="h-3 bg-slate-900 rounded-full overflow-hidden">
+                                <div id="dailyProgressBar" class="h-full bg-gradient-to-r from-violet-500 to-violet-600 transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                            <p id="dailyProgressText" class="text-slate-400 text-xs mt-1 text-center">%0</p>
+                        </div>
                         {% for gorev in gunun_onemlileri[:3] %}
-                        <div class="bg-slate-900/50 p-3 rounded-lg border-l-4 border-yellow-500">
-                            <p class="text-white font-semibold text-sm">{{ gorev.baslik }}</p>
-                            {% if gorev.saat %}<p class="text-slate-500 text-xs mt-1"><i class="fas fa-clock mr-1"></i> {{ gorev.saat }}</p>{% endif %}
+                        <div class="bg-slate-900/50 p-3 rounded-lg border-l-4 border-yellow-500 flex items-start gap-2">
+                            <input type="checkbox" class="mt-0.5 w-4 h-4 task-checkbox rounded cursor-pointer" data-id="{{ gorev.id }}" {% if gorev.durum == 'BITTI' %}checked{% endif %} onchange="updateTaskProgress(this)">
+                            <div>
+                                <p class="text-white font-semibold text-sm {% if gorev.durum == 'BITTI' %}line-through text-slate-400{% endif %}">{{ gorev.baslik }}</p>
+                                {% if gorev.saat %}<p class="text-slate-500 text-xs mt-1"><i class="fas fa-clock mr-1"></i> {{ gorev.saat }}</p>{% endif %}
+                            </div>
                         </div>
                         {% endfor %}
                     {% else %}
@@ -260,6 +273,48 @@
 <script>
     let calendar;
 
+    function updateTaskProgress(checkbox) {
+        const taskId = checkbox.dataset.id;
+        const newStatus = checkbox.checked ? 'BITTI' : 'YAPILIYOR';
+        
+        fetch(`/admin/planner/update_status/${taskId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ yeni_durum: newStatus })
+        }).then(r => r.json()).then(data => {
+            if (data.success) {
+                // DOM'u anında güncelle (line-through efekti)
+                checkbox.parentElement.querySelector('p').classList.toggle('line-through');
+                checkbox.parentElement.querySelector('p').classList.toggle('text-slate-400');
+                updateProgressBar();
+            }
+        }).catch(e => console.error('Hata:', e));
+    }
+
+    function updateProgressBar() {
+        // Tüm checkbox'ları say
+        const allTasks = document.querySelectorAll('.task-checkbox').length;
+        const completedTasks = document.querySelectorAll('.task-checkbox:checked').length;
+        
+        if (allTasks > 0) {
+            const percentage = Math.round((completedTasks / allTasks) * 100);
+            const progressBar = document.getElementById('dailyProgressBar');
+            const progressText = document.getElementById('dailyProgressText');
+            
+            if (progressBar && progressText) {
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = '%' + percentage;
+                
+                // Renk değişimi
+                if (percentage === 100) {
+                    progressBar.style.background = 'linear-gradient(to right, #10b981, #34d399)';
+                } else if (percentage >= 50) {
+                    progressBar.style.background = 'linear-gradient(to right, #8b5cf6, #a855f7)';
+                }
+            }
+        }
+    }
+
     function switchTab(tab) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
         document.querySelectorAll('.tab-button').forEach(el => {
@@ -303,8 +358,10 @@
         }
     }
 
-    // Haftalık drag-drop
+    // İlk yüklemede ilerlemeyi hesapla
     document.addEventListener('DOMContentLoaded', function() {
+        updateProgressBar();
+        
         document.querySelectorAll('.haftalik-dropzone').forEach(zone => {
             Sortable.create(zone, {
                 group: 'haftalik',
