@@ -62,10 +62,7 @@ class Proje(db.Model):
     versiyon_gecmisi = db.Column(db.Text)
     kapak_resmi = db.Column(db.String(255))
     detayli_icerik = db.Column(db.Text)
-
-    @property
-    def ilerleme_yuzde(self):
-        return 0
+    ilerleme_yuzde = db.Column(db.Integer, default=0)
 
 class Kitap(db.Model):
     id = db.Column(db.Integer, primary_key=True)
