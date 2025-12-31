@@ -515,6 +515,47 @@ def create_app():
         flash('Proje silindi.', 'success')
         return redirect(url_for('admin_studio'))
 
+    @app.route('/admin/ideas/complete/<int:id>', methods=['POST'])
+    @login_required
+    def complete_idea(id):
+        fikir = ProjeFikri.query.get_or_404(id)
+        fikir.durum = 'BITTI'
+        fikir.bitis_tarihi = datetime.now()
+        db.session.commit()
+        flash('Proje tamamlandı.', 'success')
+        return redirect(url_for('admin_ideas'))
+
+    @app.route('/admin/ideas/delete/<int:id>')
+    @login_required
+    def delete_idea(id):
+        fikir = ProjeFikri.query.get_or_404(id)
+        db.session.delete(fikir)
+        db.session.commit()
+        flash('Fikir silindi.', 'success')
+        return redirect(url_for('admin_ideas'))
+
+    @app.route('/admin/ideas/progress/<int:id>', methods=['POST'])
+    @login_required
+    def update_idea_progress(id):
+        fikir = ProjeFikri.query.get_or_404(id)
+        data = request.get_json()
+        if data and 'ilerleme' in data:
+            fikir.ilerleme = int(data['ilerleme'])
+            db.session.commit()
+            return jsonify({'success': True})
+        return jsonify({'success': False}), 400
+
+    @app.route('/admin/studio/update/<int:id>', methods=['POST'])
+    @login_required
+    def update_studio_project(id):
+        proje = StudioProject.query.get_or_404(id)
+        proje.name = request.form.get('name')
+        proje.category = request.form.get('category')
+        proje.secure_data = request.form.get('secure_data')
+        db.session.commit()
+        flash('Proje güncellendi.', 'success')
+        return redirect(url_for('admin_studio'))
+
     @app.route('/admin/skill/edit/<int:id>', methods=['GET', 'POST'])
     @login_required
     def edit_skill(id):
