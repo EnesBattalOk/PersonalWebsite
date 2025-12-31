@@ -94,8 +94,8 @@
             {% for proje in aktif_projeler %}
             <div class="bg-slate-900 rounded-xl border-2 border-violet-500 p-6 shadow-lg shadow-violet-500/10">
                 <!-- Project Header (Accordion Toggle) -->
-                <div class="flex items-center justify-between cursor-pointer" onclick="toggleProject({{ proje.id }})">
-                    <div>
+                <div class="flex items-center justify-between">
+                    <div class="cursor-pointer flex-1" onclick="toggleProject({{ proje.id }})">
                         <h3 class="text-lg font-bold text-white">{{ proje.baslik }}</h3>
                         <div class="text-sm text-slate-300 mt-1">
                             <i class="fas fa-calendar mr-2 text-violet-400"></i>
@@ -111,8 +111,13 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="text-slate-400 text-2xl">
-                        <i class="fas fa-chevron-down" id="toggle-icon-{{ proje.id }}"></i>
+                    <div class="flex items-center gap-2">
+                        <button onclick="openProjectMap({{ proje.id }}, '{{ proje.baslik }}')" class="px-3 py-2 bg-violet-500/20 hover:bg-violet-500/40 text-violet-300 rounded-lg text-sm transition-all" title="Proje Haritasını Gör">
+                            <i class="fas fa-map mr-1"></i> Harita
+                        </button>
+                        <div class="text-slate-400 text-2xl cursor-pointer" onclick="toggleProject({{ proje.id }})">
+                            <i class="fas fa-chevron-down" id="toggle-icon-{{ proje.id }}"></i>
+                        </div>
                     </div>
                 </div>
 
@@ -834,6 +839,79 @@
         })
         .catch(error => console.error('Hata:', error));
     };
+
+    // Proje Haritası Modal
+    function openProjectMap(projectId, projectTitle) {
+        const phases = {};
+        const phaseElements = document.querySelectorAll(`[data-project-id="${projectId}"]`);
+        
+        phaseElements.forEach(column => {
+            const status = column.dataset.status;
+            const statusMap = { 'YAPILACAK': 'Yapılacaklar', 'SURUYOR': 'Sürüyor', 'BITTI': 'Tamamlandı' };
+            phases[statusMap[status]] = [];
+            
+            column.querySelectorAll('[data-task-id]').forEach(task => {
+                const taskTitle = task.querySelector('p').textContent;
+                const taskPhase = task.querySelector('.text-xs')?.textContent || 'Belirsiz';
+                phases[statusMap[status]].push({ title: taskTitle, phase: taskPhase, status: status });
+            });
+        });
+        
+        let modal = document.getElementById('projectMapModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'projectMapModal';
+            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto;';
+            document.body.appendChild(modal);
+        }
+        
+        let content = `
+            <div style="background:#1e293b; width:90%; max-width:900px; margin:40px auto; padding:30px; border-radius:15px; border:2px solid #7c3aed;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h2 style="color:white; font-size:24px; font-weight:bold;">🗺️ Proje Haritası: ${projectTitle}</h2>
+                    <button onclick="closeProjectMap()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">✕</button>
+                </div>
+                <hr style="border:none; border-top:1px solid #475569; margin-bottom:20px;">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">
+        `;
+        
+        const statusColors = { 'YAPILACAK': '#f59e0b', 'SURUYOR': '#3b82f6', 'BITTI': '#10b981' };
+        const statusIcons = { 'YAPILACAK': '📋', 'SURUYOR': '⚙️', 'BITTI': '✅' };
+        
+        for (const [statusName, tasks] of Object.entries(phases)) {
+            const statusKey = Object.keys({ 'YAPILACAKLAR': 'YAPILACAK', 'Sürüyor': 'SURUYOR', 'Tamamlandı': 'BITTI' }).find(k => Object.values({ 'YAPILACAKLAR': 'YAPILACAK', 'Sürüyor': 'SURUYOR', 'Tamamlandı': 'BITTI' })[k] === statusName);
+            const color = Object.values(statusColors)[Object.keys(statusColors).indexOf(Object.keys(statusColors).find(k => Object.values({ 'YAPILACAK': '#f59e0b', 'SURUYOR': '#3b82f6', 'BITTI': '#10b981' })[k] === statusName) || 0)] || '#8b5cf6';
+            
+            content += `
+                <div style="background:#0f172a; border-left:5px solid ${color}; padding:15px; border-radius:10px;">
+                    <h3 style="color:${color}; font-weight:bold; margin-bottom:10px; font-size:16px;">
+                        ${statusName} (${tasks.length})
+                    </h3>
+                    <ul style="list-style:none; padding:0; margin:0;">
+            `;
+            
+            tasks.forEach(task => {
+                const icon = task.status === 'BITTI' ? '✅' : task.status === 'SURUYOR' ? '⚙️' : '📋';
+                content += `<li style="color:#e2e8f0; padding:8px 0; border-bottom:1px solid #334155; font-size:14px;">
+                    <span>${icon}</span> ${task.title}
+                    <p style="color:#94a3b8; font-size:12px; margin:4px 0 0 0;">📌 ${task.phase}</p>
+                </li>`;
+            });
+            
+            content += `</ul></div>`;
+        }
+        
+        content += `</div></div>`;
+        modal.innerHTML = content;
+        modal.style.display = 'block';
+        
+        modal.onclick = (e) => { if (e.target === modal) closeProjectMap(); };
+    }
+    
+    function closeProjectMap() {
+        const modal = document.getElementById('projectMapModal');
+        if (modal) modal.style.display = 'none';
+    }
 
     // Initialize: rotate toggle icons & setup Kanban
     document.addEventListener('DOMContentLoaded', function() {

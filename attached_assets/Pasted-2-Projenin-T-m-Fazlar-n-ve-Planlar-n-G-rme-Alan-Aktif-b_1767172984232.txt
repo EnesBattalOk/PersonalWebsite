@@ -1,0 +1,58 @@
+2. Projenin Tüm Fazlarını ve Planlarını Görme Alanı
+Aktif bir projenin içindeyken, detaylarda kaybolmamak için "Büyük Resmi" görecek bir alana ihtiyacın var. Bunun için sayfayı değiştirmek yerine "Modal" (Açılır Pencere) veya "Offcanvas" (Yandan Açılan Menü) kullanmak en modern yöntemdir.
+
+Tasarım Önerisi: Ekranın sağ üst köşesine veya menüye "Proje Haritası" veya "Tüm Plan" diye bir buton koyalım. Tıklayınca sayfa değişmesin, ekranın ortasında bir pencere açılsın.
+
+Basit Bir "Proje Özeti" Yapısı:
+
+Bunu HTML/CSS ile şöyle kurgulayabilirsin:
+
+HTML
+
+<button onclick="openProjectMap()">🗺️ Proje Haritasını Gör</button>
+
+<div id="projectMapModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8);">
+    <div style="background:white; width:80%; margin:5% auto; padding:20px; border-radius:10px; max-height: 80vh; overflow-y: auto;">
+        
+        <div style="display:flex; justify-content:space-between;">
+            <h2>Proje: TarımPazarı (Örnek)</h2>
+            <button onclick="closeProjectMap()" style="background:red; color:white;">X</button>
+        </div>
+
+        <hr>
+
+        <div class="phase-list">
+            <div class="phase-item" style="border-left: 5px solid green; padding-left:10px; margin-bottom:15px;">
+                <h3>Faz 1: Planlama (Tamamlandı)</h3>
+                <ul>
+                    <li>✅ Fikir doğrulama</li>
+                    <li>✅ Veritabanı şeması</li>
+                </ul>
+            </div>
+
+            <div class="phase-item" style="border-left: 5px solid orange; padding-left:10px; margin-bottom:15px;">
+                <h3>Faz 2: Geliştirme (Aktif)</h3>
+                <ul>
+                    <li>🔲 Login ekranı yapılacak</li>
+                    <li>🔲 API yazılacak</li>
+                </ul>
+            </div>
+            
+             <div class="phase-item" style="border-left: 5px solid gray; padding-left:10px; margin-bottom:15px;">
+                <h3>Faz 3: Test (Bekliyor)</h3>
+                <p>Henüz başlanmadı.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function openProjectMap() {
+    document.getElementById('projectMapModal').style.display = 'block';
+}
+function closeProjectMap() {
+    document.getElementById('projectMapModal').style.display = 'none';
+}
+</script>
+Bu yaklaşımın avantajı: Kullanıcı o an bir kod yazıyor veya bir görevi güncelliyorsa, sayfadan kopmadan "Ben neredeydim?" diye bakıp kapatabilir.
