@@ -16,3 +16,12 @@ sqlalchemy
 werkzeug
 beautifulsoup4
 requests
+beautifulsoup4
+cryptography
+flask
+flask-login
+flask-sqlalchemy
+Pillow
+requests
+sqlalchemy
+werkzeug
