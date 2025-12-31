@@ -88,17 +88,24 @@
                 <div class="flex-1 min-w-0 text-left">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-violet-500/10 text-violet-400">{{ item.tip }}</span>
+                        <div class="flex gap-2">
+                            {% if item.degree %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
+                                {{ item.degree | upper }}
+                            </span>
+                            {% endif %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)] whitespace-nowrap">
+                                {% if item.start_date %}
+                                    {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
+                                {% else %}
+                                    {{ item.tarih_araligi }}
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold text-white mt-2">
-                        {{ item.baslik }}{% if item.degree %} - {{ item.degree }}{% endif %}
+                        {{ item.baslik }} <span class="text-slate-500 font-medium">{% if item.degree %} - {{ item.degree }}{% endif %}</span>
                     </h3>
-                    <p class="text-slate-400 text-sm break-all">
-                        {% if item.start_date %}
-                            {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
-                        {% else %}
-                            {{ item.tarih_araligi }}
-                        {% endif %}
-                    </p>
                     <p class="text-slate-300 text-sm mt-2 break-all">{{ item.notlar }}</p>
                 </div>
             </div>
@@ -123,17 +130,24 @@
                 <div class="flex-1 min-w-0 text-left">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold uppercase px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">{{ item.tip }}</span>
+                        <div class="flex gap-2">
+                            {% if item.position %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                                {{ item.position | upper }}
+                            </span>
+                            {% endif %}
+                            <span class="px-3 py-1 rounded-full text-xs font-bold border border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10_rgba(16,185,129,0.2)] whitespace-nowrap">
+                                {% if item.start_date %}
+                                    {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
+                                {% else %}
+                                    {{ item.tarih_araligi }}
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold text-white mt-2">
-                        {{ item.baslik }}{% if item.position %} - {{ item.position }}{% endif %}
+                        {{ item.baslik }} <span class="text-slate-500 font-medium">{% if item.position %} - {{ item.position }}{% endif %}</span>
                     </h3>
-                    <p class="text-slate-400 text-sm break-all">
-                        {% if item.start_date %}
-                            {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
-                        {% else %}
-                            {{ item.tarih_araligi }}
-                        {% endif %}
-                    </p>
                     <p class="text-slate-300 text-sm mt-2 break-all">{{ item.notlar }}</p>
                 </div>
             </div>
