@@ -486,7 +486,7 @@ def create_app():
     @login_required
     def admin_studio():
         projeler = StudioProject.query.order_by(StudioProject.olusturma_tarihi.desc()).all()
-        return render_template('admin_studio.html', projeler=projeler)
+        return render_template('studio.html', projeler=projeler)
 
     @app.route('/admin/studio/add', methods=['POST'])
     @login_required
@@ -608,6 +608,36 @@ def create_app():
         db.session.commit()
         flash('Yetenek silindi.', 'success')
         return redirect(url_for('admin_skills'))
+
+    @app.route('/admin/projects/edit/<int:id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_project(id):
+        proje = Proje.query.get_or_404(id)
+        if request.method == 'POST':
+            proje.baslik = request.form.get('baslik')
+            proje.notlar = request.form.get('notlar')
+            proje.detayli_icerik = request.form.get('detayli_icerik')
+            proje.github_link = request.form.get('github_link')
+            proje.canli_link = request.form.get('canli_link')
+            if 'kapak_resmi' in request.files:
+                file = request.files['kapak_resmi']
+                if file and file.filename != '':
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    proje.kapak_resmi = url_for('static', filename='uploads/' + filename)
+            db.session.commit()
+            flash('Proje güncellendi.', 'success')
+            return redirect(url_for('admin_projects'))
+        return render_template('admin_project_edit.html', proje=proje)
+
+    @app.route('/admin/projects/delete/<int:id>')
+    @login_required
+    def delete_project(id):
+        proje = Proje.query.get_or_404(id)
+        db.session.delete(proje)
+        db.session.commit()
+        flash('Proje silindi.', 'success')
+        return redirect(url_for('admin_projects'))
 
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
