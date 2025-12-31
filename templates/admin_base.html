@@ -17,12 +17,15 @@
             border-right: 3px solid #7c3aed;
             box-shadow: 10px 0 15px -10px rgba(124, 58, 237, 0.5);
         }
-        /* Scrollbar'ı gizle (kaydırma işlevi kalsın) */
-        #sidebar {
-            scrollbar-width: none; /* Firefox */
+        /* Scrollbar'ı tüm tarayıcılarda gizle (kaydırma işlevi kalsın) */
+        #sidebar nav {
+            scrollbar-width: none !important; /* Firefox */
+            -ms-overflow-style: none !important; /* Internet Explorer / Edge */
         }
-        #sidebar::-webkit-scrollbar {
-            display: none; /* Chrome/Safari */
+        #sidebar nav::-webkit-scrollbar {
+            display: none !important; /* Chrome, Safari, Opera */
+            width: 0 !important;
+            height: 0 !important;
         }
     </style>
 </head>
