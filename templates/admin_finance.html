@@ -22,20 +22,20 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
             <!-- NAKİT -->
             <div class="group bg-slate-900 rounded-2xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] overflow-hidden">
-                <div class="p-6 pb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-500 group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-wallet text-2xl"></i>
+                <div class="p-4 sm:p-6 pb-3 sm:pb-4">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-3 bg-emerald-500/10 rounded-xl text-emerald-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-wallet text-xl sm:text-2xl"></i>
                         </div>
-                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">TL / NAKİT</span>
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-tighter">TL / NAKİT</span>
                     </div>
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Toplam Nakit</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['NAKIT']['toplam']) }}</p>
-                        <span class="text-sm text-emerald-500">₺</span>
+                    <h3 class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase mb-1">Toplam Nakit</h3>
+                    <div class="flex items-baseline gap-1.5 sm:gap-2">
+                        <p class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['NAKIT']['toplam']) }}</p>
+                        <span class="text-xs sm:text-sm text-emerald-500">₺</span>
                     </div>
                 </div>
-                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                <div class="px-4 sm:px-6 py-2 sm:py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                     <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['NAKIT']['fiziksel']) }} ₺</span></div>
                     <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['NAKIT']['banka']) }} ₺</span></div>
                 </div>
@@ -43,20 +43,20 @@
 
             <!-- ALTIN -->
             <div class="group bg-slate-900 rounded-2xl border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] overflow-hidden">
-                <div class="p-6 pb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-coins text-2xl"></i>
+                <div class="p-4 sm:p-6 pb-3 sm:pb-4">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-3 bg-yellow-500/10 rounded-xl text-yellow-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-coins text-xl sm:text-2xl"></i>
                         </div>
-                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">ALTIN (GRAM)</span>
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-tighter">ALTIN (GRAM)</span>
                     </div>
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Altın Rezervi</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['ALTIN']['toplam']) }}</p>
-                        <span class="text-xs text-yellow-500">gr (≈ {{ "{:,.0f}".format(varliklar['ALTIN']['toplam'] * canli_kurlar['ALTIN']) }} ₺)</span>
+                    <h3 class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase mb-1">Altın Rezervi</h3>
+                    <div class="flex items-baseline gap-1.5 sm:gap-2">
+                        <p class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['ALTIN']['toplam']) }}</p>
+                        <span class="text-[10px] sm:text-xs text-yellow-500">gr (≈ {{ "{:,.0f}".format(varliklar['ALTIN']['toplam'] * canli_kurlar['ALTIN']) }} ₺)</span>
                     </div>
                 </div>
-                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                <div class="px-4 sm:px-6 py-2 sm:py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                     <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['ALTIN']['fiziksel']) }} gr</span></div>
                     <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['ALTIN']['banka']) }} gr</span></div>
                 </div>
@@ -64,20 +64,20 @@
 
             <!-- DÖVİZ -->
             <div class="group bg-slate-900 rounded-2xl border border-blue-500/20 hover:border-blue-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] overflow-hidden">
-                <div class="p-6 pb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500 group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-dollar-sign text-2xl"></i>
+                <div class="p-4 sm:p-6 pb-3 sm:pb-4">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-3 bg-blue-500/10 rounded-xl text-blue-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-dollar-sign text-xl sm:text-2xl"></i>
                         </div>
-                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">DÖVİZ (USD)</span>
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-tighter">DÖVİZ (USD)</span>
                     </div>
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Dolar Hesabı</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['USD']['toplam']) }}</p>
-                        <span class="text-xs text-blue-500">$ (≈ {{ "{:,.0f}".format(varliklar['USD']['toplam'] * canli_kurlar['USD']) }} ₺)</span>
+                    <h3 class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase mb-1">Dolar Hesabı</h3>
+                    <div class="flex items-baseline gap-1.5 sm:gap-2">
+                        <p class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['USD']['toplam']) }}</p>
+                        <span class="text-[10px] sm:text-xs text-blue-500">$ (≈ {{ "{:,.0f}".format(varliklar['USD']['toplam'] * canli_kurlar['USD']) }} ₺)</span>
                     </div>
                 </div>
-                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                <div class="px-4 sm:px-6 py-2 sm:py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                     <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['USD']['fiziksel']) }} $</span></div>
                     <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['USD']['banka']) }} $</span></div>
                 </div>
@@ -85,20 +85,20 @@
 
             <!-- GÜMÜŞ -->
             <div class="group bg-slate-900 rounded-2xl border border-slate-400/20 hover:border-slate-400/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(148,163,184,0.1)] overflow-hidden">
-                <div class="p-6 pb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-slate-400/10 rounded-xl text-slate-400 group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-gem text-2xl"></i>
+                <div class="p-4 sm:p-6 pb-3 sm:pb-4">
+                    <div class="flex justify-between items-start mb-3 sm:mb-4">
+                        <div class="p-2 sm:p-3 bg-slate-400/10 rounded-xl text-slate-400 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-gem text-xl sm:text-2xl"></i>
                         </div>
-                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">GÜMÜŞ (GRAM)</span>
+                        <span class="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-tighter">GÜMÜŞ (GRAM)</span>
                     </div>
-                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Gümüş Rezervi</h3>
-                    <div class="flex items-baseline gap-2">
-                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['GUMUS']['toplam']) }}</p>
-                        <span class="text-xs text-slate-400">gr (≈ {{ "{:,.0f}".format(varliklar['GUMUS']['toplam'] * canli_kurlar['GUMUS']) }} ₺)</span>
+                    <h3 class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase mb-1">Gümüş Rezervi</h3>
+                    <div class="flex items-baseline gap-1.5 sm:gap-2">
+                        <p class="text-xl sm:text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['GUMUS']['toplam']) }}</p>
+                        <span class="text-[10px] sm:text-xs text-slate-400">gr (≈ {{ "{:,.0f}".format(varliklar['GUMUS']['toplam'] * canli_kurlar['GUMUS']) }} ₺)</span>
                     </div>
                 </div>
-                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                <div class="px-4 sm:px-6 py-2 sm:py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[8px] sm:text-[10px] font-bold uppercase tracking-widest">
                     <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['GUMUS']['fiziksel']) }} gr</span></div>
                     <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['GUMUS']['banka']) }} gr</span></div>
                 </div>
