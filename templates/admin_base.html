@@ -17,6 +17,13 @@
             border-right: 3px solid #7c3aed;
             box-shadow: 10px 0 15px -10px rgba(124, 58, 237, 0.5);
         }
+        /* Scrollbar'ı gizle (kaydırma işlevi kalsın) */
+        #sidebar {
+            scrollbar-width: none; /* Firefox */
+        }
+        #sidebar::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 flex min-h-screen">
