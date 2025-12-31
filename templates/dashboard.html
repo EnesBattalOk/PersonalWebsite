@@ -1,0 +1,155 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="space-y-8 pb-20">
+
+    <!-- Welcome Section -->
+    <header>
+        <h1 class="text-4xl font-bold text-white">Admin Paneline Hoş Geldiniz</h1>
+        <p class="text-slate-400 mt-2">Merhaba, <span class="text-violet-400 font-semibold">{{ current_user.kullanici_adi }}</span>! Bugün her şey yolunda görünüyor.</p>
+    </header>
+
+    <!-- Dashboard Cards -->
+    <section>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Genel Ayarlar Card -->
+            <a href="{{ url_for('admin_settings') }}" class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-violet-500/50 hover:shadow-[0_0_20px_rgba(124,58,237,0.15)] transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-slate-300 font-medium">Genel Ayarlar</h3>
+                    <div class="p-2 bg-violet-500/10 rounded-lg text-violet-400 group-hover:text-violet-300">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-white mb-2"><i class="fas fa-user-edit"></i></div>
+                <p class="text-xs text-slate-500">Profil ve İletişim</p>
+            </a>
+
+            <!-- Projects Card -->
+            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-violet-500/50 transition-all duration-300 group cursor-pointer">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-slate-300 font-medium">Projeler</h3>
+                    <div class="p-2 bg-violet-500/10 rounded-lg text-violet-400">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-white mb-2">{{ proje_sayisi }}</div>
+                <p class="text-xs text-slate-500">Yönetim ve düzenleme</p>
+            </div>
+
+            <!-- Skills Card -->
+            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-violet-500/50 transition-all duration-300 group cursor-pointer">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-slate-300 font-medium">Yetenekler</h3>
+                    <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-white mb-2">{{ yetenek_sayisi }}</div>
+                <p class="text-xs text-slate-500">Profil güncelle</p>
+            </div>
+
+            <!-- Messages Card -->
+            <a href="{{ url_for('admin_inbox') }}" class="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-violet-500/50 transition-all duration-300 group">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-slate-300 font-medium">Mesajlar</h3>
+                    <div class="p-2 bg-blue-500/10 rounded-lg text-blue-400">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                </div>
+                <div class="text-3xl font-bold text-white mb-2">{{ mesaj_sayisi }}</div>
+                <p class="text-xs text-slate-500">Gelen kutusunu yönet</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section>
+        <h2 class="text-2xl font-bold text-white mb-6">Hızlı İşlemler</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <a href="{{ url_for('admin_projects') }}" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-violet-500/50 rounded-lg text-left transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-semibold group-hover:text-violet-400 transition-colors">Yeni Proje Ekle</h3>
+                        <p class="text-slate-500 text-sm mt-1">Portfolio'ya yeni bir proje ekleyin</p>
+                    </div>
+                    <i class="fas fa-plus text-slate-600 group-hover:text-violet-400 text-xl"></i>
+                </div>
+            </a>
+
+            <a href="{{ url_for('admin_settings') }}" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-violet-500/50 rounded-lg text-left transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-semibold group-hover:text-violet-400 transition-colors">Profili Düzenle</h3>
+                        <p class="text-slate-500 text-sm mt-1">Kişisel bilgilerinizi güncelleyin</p>
+                    </div>
+                    <i class="fas fa-edit text-slate-600 group-hover:text-violet-400 text-xl"></i>
+                </div>
+            </a>
+
+            <button onclick="document.getElementById('statsModal').classList.remove('hidden')" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-violet-500/50 rounded-lg text-left transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-semibold group-hover:text-violet-400 transition-colors">İstatistikleri Gör</h3>
+                        <p class="text-slate-500 text-sm mt-1">Portfolio ziyaretçi istatistikleri</p>
+                    </div>
+                    <i class="fas fa-chart-bar text-slate-600 group-hover:text-violet-400 text-xl"></i>
+                </div>
+            </button>
+
+            <a href="{{ url_for('admin_inbox') }}" class="p-4 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-violet-500/50 rounded-lg text-left transition-all group">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-white font-semibold group-hover:text-violet-400 transition-colors">Mesajlar</h3>
+                        <p class="text-slate-500 text-sm mt-1">Gelen iletişim formlarını yönetin</p>
+                    </div>
+                    <i class="fas fa-inbox text-slate-600 group-hover:text-violet-400 text-xl"></i>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- Stats Modal -->
+    <div id="statsModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-violet-500/30 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white">Ziyaretçi İstatistikleri</h2>
+                    <button onclick="document.getElementById('statsModal').classList.add('hidden')" class="text-slate-500 hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-950/50 p-6 rounded-2xl border border-slate-800">
+                            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Toplam Ziyaretçi (Tekil)</p>
+                            <p class="text-3xl font-black text-white">{{ toplam_ziyaret }}</p>
+                        </div>
+                        <div class="bg-slate-950/50 p-6 rounded-2xl border border-slate-800">
+                            <p class="text-slate-500 text-xs font-bold uppercase tracking-widest mb-1">Bugünkü Ziyaretçi (Tekil)</p>
+                            <p class="text-3xl font-black text-violet-400">{{ bugun_ziyaret }}</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-950/50 p-6 rounded-2xl border border-slate-800 text-center">
+                        <i class="fas fa-chart-line text-4xl text-slate-700 mb-4"></i>
+                        <p class="text-slate-400 text-sm italic">Her IP adresi gün içinde sadece 1 kez sayılır.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <section class="bg-violet-500/10 border border-violet-500/30 rounded-xl p-6">
+        <div class="flex items-start gap-4">
+            <i class="fas fa-info-circle text-violet-400 text-xl mt-1"></i>
+            <div>
+                <h3 class="text-white font-semibold mb-2">Admin Paneline Hoş Geldiniz</h3>
+                <p class="text-slate-300 text-sm">Bu panel, portfolio'nuzu yönetmek ve içeriği güncellemek için tasarlanmıştır. Tüm özellikler henüz geliştirme aşamasındadır.</p>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | Enes Battal Ok</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .sidebar-item-active {
+            background-color: rgb(124 58 237 / 0.1);
+            color: #a78bfa;
+            border-right: 3px solid #7c3aed;
+            box-shadow: 10px 0 15px -10px rgba(124, 58, 237, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 flex min-h-screen">
+
+    <!-- Mobile Header -->
+    <div class="lg:hidden fixed top-0 w-full z-[60] bg-slate-900 border-b border-slate-800 h-16 flex items-center justify-between px-4">
+        <h1 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-7 h-7 bg-violet-600 rounded flex items-center justify-center">
+                <i class="fas fa-terminal text-xs"></i>
+            </span>
+            Enes Battal Ok
+        </h1>
+        <button onclick="toggleSidebar()" class="p-2 text-slate-400 hover:text-white">
+            <i id="sidebarIcon" class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col fixed h-full z-50 transition-transform -translate-x-full lg:translate-x-0">
+        <div class="p-6 hidden lg:block">
+            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center shadow-lg shadow-violet-500/30">
+                    <i class="fas fa-terminal text-sm"></i>
+                </span>
+                Enes Battal Ok
+            </h1>
+        </div>
+        
+        <div class="h-16 lg:hidden"></div> <!-- Spacer for mobile header -->
+
+        <nav class="flex-grow overflow-y-auto px-4 space-y-8 py-4">
+            <!-- Kişisel Yönetim -->
+            <div>
+                <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">Kişisel Yönetim</p>
+                <div class="space-y-1">
+                    <a href="{{ url_for('dashboard') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('dashboard') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-chart-pie w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Genel Bakış</span>
+                    </a>
+                    <a href="{{ url_for('admin_finance') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_finance') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-wallet w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Kasa</span>
+                    </a>
+                    <a href="{{ url_for('admin_planner') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_planner') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-calendar-alt w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Planlayıcı</span>
+                    </a>
+                    <a href="{{ url_for('admin_diaries') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_diaries') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-journal-whills w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Günlükler</span>
+                    </a>
+                    <a href="{{ url_for('admin_books') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_books') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-book w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Kitaplık</span>
+                    </a>
+                    <a href="{{ url_for('admin_ideas') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_ideas') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-lightbulb w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Fikir Laboratuvarı</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- CV Websitesi -->
+            <div>
+                <p class="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4">CV Websitesi (CMS)</p>
+                <div class="space-y-1">
+                    <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_settings') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-cog w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Genel Ayarlar</span>
+                    </a>
+                    <a href="{{ url_for('admin_projects') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_projects') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-code w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Projeler</span>
+                    </a>
+                    <a href="{{ url_for('admin_skills') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_skills') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-wand-magic-sparkles w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Yetenekler</span>
+                    </a>
+                    <a href="{{ url_for('admin_resume') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_resume') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-graduation-cap w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Eğitim & Kariyer</span>
+                    </a>
+                    <a href="{{ url_for('admin_inbox') }}" class="flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all hover:bg-slate-800 group {% if request.path == url_for('admin_inbox') %}sidebar-item-active{% endif %}">
+                        <i class="fas fa-inbox w-5 text-slate-400 group-hover:text-violet-400"></i>
+                        <span class="text-sm font-medium">Gelen Kutusu</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="p-4 border-t border-slate-800 space-y-1">
+            <a href="{{ url_for('home') }}" target="_blank" class="flex items-center gap-3 px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all text-sm">
+                <i class="fas fa-external-link-alt w-5"></i>
+                Siteyi Gör
+            </a>
+            <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-all text-sm">
+                <i class="fas fa-sign-out-alt w-5"></i>
+                Çıkış Yap
+            </a>
+        </div>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="flex-grow lg:ml-64 p-4 md:p-8 pt-20 lg:pt-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for category, message in messages %}
+                        <div class="p-4 rounded-xl {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %} flex items-center gap-3">
+                            <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('sidebarIcon');
+            sidebar.classList.toggle('-translate-x-full');
+            icon.classList.toggle('fa-bars');
+            icon.classList.toggle('fa-times');
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+</body>
+</html>

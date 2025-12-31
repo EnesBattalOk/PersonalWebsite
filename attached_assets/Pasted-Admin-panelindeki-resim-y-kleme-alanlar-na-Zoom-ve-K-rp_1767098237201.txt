@@ -1,0 +1,40 @@
+Admin panelindeki resim yükleme alanlarına "Zoom ve Kırpma" (Image Cropping) özelliği eklemek istiyoruz. Bunun için 'Cropper.js' kütüphanesini kullanacağız.
+
+Bu özelliği ilk olarak 'Genel Ayarlar' sayfasındaki (/admin/settings) Profil Fotoğrafı yükleme alanına entegre edelim.
+
+Lütfen aşağıdaki adımları uygula:
+
+ADIM 1: Kütüphaneleri Dahil Et
+- 'templates/admin_base.html' dosyasının <head> kısmına Cropper.js CSS CDN'ini ekle:
+  `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">`
+- Dosyanın en altına, </body> kapanış etiketinden hemen önce JS CDN'ini ekle:
+  `<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>`
+
+ADIM 2: HTML Yapısını Hazırla (templates/admin_settings.html)
+- Mevcut profil fotoğrafı `<input type="file">` alanının altına, gizli bir modal (popup) yapısı ekle. Bu modal, kullanıcı bir resim seçtiğinde açılacak.
+- Modal içinde şunlar olmalı:
+  - Seçilen resmin önizlemesi için bir `<img>` etiketi (id="image-to-crop").
+  - Kontrol butonları: "Zoom +" (Büyüteç), "Zoom -" (Küçülteme), "Kırp ve Kaydet" (Onay), "İptal".
+  - Kırpılan resmin verisini tutacak GİZLİ bir input alanı: `<input type="hidden" id="cropped-data" name="cropped_data">`.
+
+ADIM 3: JavaScript Entegrasyonu (templates/admin_settings.html)
+- Sayfanın altına bir `<script>` bloğu aç ve şu mantığı kur:
+  1. Dosya inputunda değişiklik olduğunda (change event), seçilen dosyayı oku ve modal içindeki `<img>` etiketine kaynak (src) olarak ver. Modalı görünür yap.
+  2. Resim yüklendiğinde 'Cropper' nesnesini başlat. Ayarlar: `aspectRatio: 1` (Kare olması için), `viewMode: 1`.
+  3. Zoom butonlarına tıklandığında `cropper.zoom(0.1)` ve `cropper.zoom(-0.1)` metodlarını çağır.
+  4. "Kırp ve Kaydet" butonuna tıklandığında:
+     - `cropper.getCroppedCanvas().toDataURL('image/jpeg')` ile kırpılmış resmin base64 verisini al.
+     - Bu veriyi gizli olan `cropped-data` inputunun value'suna ata.
+     - Modalı kapat.
+     - Kullanıcıya görsel olarak resmin hazır olduğunu göster (İsteğe bağlı: küçük bir önizleme).
+
+ADIM 4: Backend Güncellemesi (main.py)
+- `/admin/settings` POST rotasını güncelle.
+- Artık sadece `request.files['profil_foto']` kontrolü yetmez. Şunu kontrol et:
+  - Eğer formdan `cropped_data` (bizim gizli input) geliyorsa:
+    - Gelen base64 verisini Python'da çöz (decode).
+    - Bunu bir resim dosyası olarak 'static/uploads' klasörüne kaydet.
+    - Veritabanını güncelle.
+  - Eğer `cropped_data` boşsa ama normal dosya seçilmişse (eski yöntem), normal yükleme işlemini yap.
+
+NOT: Bu karmaşık bir işlem, lütfen scriptlerin ve backend mantığının birbiriyle uyumlu çalıştığından emin ol.

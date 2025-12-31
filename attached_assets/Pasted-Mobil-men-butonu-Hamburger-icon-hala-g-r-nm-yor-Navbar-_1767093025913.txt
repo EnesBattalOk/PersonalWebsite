@@ -1,0 +1,98 @@
+Mobil menü butonu (Hamburger icon) hala görünmüyor. Navbar yapısını Flexbox ile tamamen yeniden kurarak bu sorunu çözelim.
+
+Lütfen 'templates/base.html' dosyasını aç ve aşağıdaki adımları uygula:
+
+ADIM 1: FontAwesome Kontrolü (Çok Önemli)
+- <head> etiketinin içine şu satırın ekli olduğundan %100 emin ol (Yoksa ikonlar görünmez):
+  `<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">`
+
+ADIM 2: Navbar'ı Tamamen Değiştir
+- Mevcut `<nav>` etiketini ve içindekileri sil. Yerine şu kodu yapıştır. Bu kodda hamburger butonu, masaüstü menüden AYRI bir yerde duruyor, bu yüzden mobilde kesinlikle görünecek:
+
+```html
+<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+        
+        <a href="/" class="text-2xl font-bold text-white tracking-wider">
+            Tunahan <span class="text-violet-500">Cengiz</span>
+        </a>
+
+        <div class="flex items-center gap-6">
+            
+            <div class="hidden lg:flex items-center gap-6">
+                <a href="/#hakkimda" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">HAKKIMDA</a>
+                <a href="/#yetenekler" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">YETENEKLER</a>
+                <a href="/#projeler" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">ÇALIŞMALAR</a>
+                <a href="/#iletisim" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">İLETİŞİM</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-3">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('admin_dashboard') }}" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-violet-700 transition-all">
+                    Panel
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="border border-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:border-violet-500 hover:text-violet-500 transition-all">
+                    Giriş
+                </a>
+                {% endif %}
+            </div>
+
+            <button id="mobile-trigger" class="lg:hidden text-white text-3xl focus:outline-none ml-2">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </div>
+    </div>
+</nav>
+ADIM 3: Off-Canvas Menüyü Ekle
+
+Sayfanın en altına, </body> etiketinden hemen önce şu menü kodunu ekle:
+
+HTML
+
+<div id="mobile-menu-overlay" class="fixed inset-0 bg-black/80 z-[90] hidden transition-opacity duration-300"></div>
+
+<div id="mobile-menu-panel" class="fixed top-0 right-0 w-72 h-full bg-slate-900 border-l border-slate-800 z-[100] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+    
+    <div class="flex items-center justify-between p-6 border-b border-slate-800">
+        <span class="text-white font-bold text-lg">Menü</span>
+        <button id="mobile-close" class="text-slate-400 hover:text-white text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="flex flex-col p-6 gap-4">
+        <a href="/" class="text-slate-300 hover:text-violet-500 text-lg">Anasayfa</a>
+        <a href="/#hakkimda" class="text-slate-300 hover:text-violet-500 text-lg">Hakkımda</a>
+        <a href="/#yetenekler" class="text-slate-300 hover:text-violet-500 text-lg">Yetenekler</a>
+        <a href="/#projeler" class="text-slate-300 hover:text-violet-500 text-lg">Çalışmalar</a>
+        <a href="/#iletisim" class="text-slate-300 hover:text-violet-500 text-lg">İletişim</a>
+        
+        <div class="h-px bg-slate-800 my-2"></div>
+        
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('admin_dashboard') }}" class="text-violet-400 font-bold">Yönetim Paneli</a>
+        <a href="{{ url_for('logout') }}" class="text-red-400">Çıkış Yap</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="text-violet-500 font-bold">Giriş Yap</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const trigger = document.getElementById('mobile-trigger');
+    const closeBtn = document.getElementById('mobile-close');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const panel = document.getElementById('mobile-menu-panel');
+
+    function toggleMenu() {
+        panel.classList.toggle('translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
+    if(trigger) trigger.addEventListener('click', toggleMenu);
+    if(closeBtn) closeBtn.addEventListener('click', toggleMenu);
+    if(overlay) overlay.addEventListener('click', toggleMenu);
+</script>
+Bu kodu uygula ve özellikle FontAwesome'ın yüklü olup olmadığını kontrol et.

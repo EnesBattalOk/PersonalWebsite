@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{{ proje.baslik }} | Proje Detayı{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-5xl">
+    <!-- Back Button -->
+    <div class="mb-8">
+        <a href="{{ url_for('home') }}#projeler" class="inline-flex items-center text-slate-400 hover:text-violet-400 transition-colors group">
+            <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i>
+            Geri Dön
+        </a>
+    </div>
+
+    <!-- Project Hero Image -->
+    <div class="relative w-full h-[400px] md:h-[500px] rounded-3xl overflow-hidden border border-slate-700 shadow-2xl mb-12 group">
+        {% if proje.kapak_resmi %}
+            <img src="{{ proje.kapak_resmi }}" alt="{{ proje.baslik }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+        {% else %}
+            <div class="w-full h-full bg-slate-800 flex items-center justify-center">
+                <i class="fas fa-image text-6xl text-slate-700"></i>
+            </div>
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+    </div>
+
+    <!-- Project Header & Actions -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
+        <div>
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">{{ proje.baslik }}</h1>
+            <p class="text-slate-400 text-lg max-w-2xl">{{ proje.notlar }}</p>
+        </div>
+        <div class="flex flex-wrap gap-4 h-fit">
+            {% if proje.github_link %}
+            <a href="{{ proje.github_link }}" target="_blank" class="flex-1 md:flex-none px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+            {% endif %}
+            {% if proje.canli_link %}
+            <a href="{{ proje.canli_link }}" target="_blank" class="flex-1 md:flex-none px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-xl shadow-lg shadow-violet-500/20 transition-all flex items-center justify-center gap-2">
+                <i class="fas fa-external-link-alt"></i> Canlı Önizleme
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Project Content -->
+    <div class="bg-slate-800/30 border border-slate-700 rounded-3xl p-8 md:p-12 mb-20">
+        <h2 class="text-2xl font-bold text-white mb-8 border-l-4 border-violet-600 pl-4">Proje Detayları</h2>
+        <div class="prose prose-invert max-w-none text-slate-300 leading-relaxed text-lg">
+            {% if proje.detayli_icerik %}
+                {{ proje.detayli_icerik | safe }}
+            {% else %}
+                <p>Bu proje için henüz detaylı içerik eklenmemiş.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

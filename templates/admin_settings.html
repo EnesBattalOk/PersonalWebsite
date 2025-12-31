@@ -1,0 +1,272 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Genel Ayarlar{% endblock %}
+
+{% block content %}
+<style>
+    /* CKEditor 5 Dark Mode Overrides */
+    :root {
+        --ck-color-base-background: #0f172a;
+        --ck-color-base-border: #475569;
+        --ck-color-toolbar-background: #1e293b;
+        --ck-color-toolbar-border: #475569;
+        --ck-color-button-default-hover-background: #7c3aed;
+        --ck-color-button-on-hover-background: #7c3aed;
+    }
+
+    .ck-reset_all :not(.ck-reset_all-child) {
+        color: #e2e8f0 !important;
+    }
+
+    .ck.ck-editor__main > .ck-editor__editable {
+        background-color: #0f172a !important;
+        color: #e2e8f0 !important;
+        border-color: #475569 !important;
+        min-height: 200px;
+    }
+
+    .ck.ck-toolbar {
+        background-color: #1e293b !important;
+        border-color: #475569 !important;
+    }
+
+    .ck.ck-button {
+        color: #cbd5e1 !important;
+        cursor: pointer;
+    }
+
+    .ck.ck-button:hover {
+        background-color: #7c3aed !important;
+        color: white !important;
+    }
+
+    .ck.ck-button.ck-on {
+        background-color: #6d28d9 !important;
+    }
+
+    /* Fix dropdowns and panels */
+    .ck.ck-list, .ck.ck-responsive-form {
+        background-color: #1e293b !important;
+    }
+    
+    .ck.ck-list__item button:hover {
+        background-color: #7c3aed !important;
+    }
+</style>
+
+<div class="pb-20">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-white">Genel Ayarlar</h1>
+    </div>
+
+    <form action="{{ url_for('admin_settings') }}" method="POST" enctype="multipart/form-data" class="space-y-8 pb-20">
+        <!-- Kişisel Bilgiler -->
+        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-xl font-bold text-violet-400 mb-6 flex items-center">
+                <i class="fas fa-user mr-3"></i> Kişisel Bilgiler
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Kullanıcı Adı (Görünen Ad)</label>
+                    <input type="text" name="kullanici_adi" value="{{ admin.kullanici_adi }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Unvan</label>
+                    <input type="text" name="unvan" value="{{ admin.unvan or '' }}" placeholder="Örn: Full Stack Developer" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Profil Fotoğrafı</label>
+                    <div class="flex items-center gap-4">
+                        {% if admin.profil_foto_url %}
+                        <img src="{{ admin.profil_foto_url }}" class="w-16 h-16 rounded-full object-cover border-2 border-violet-500/50">
+                        {% endif %}
+                        <input type="file" id="profil_foto_input" name="profil_foto" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-500/10 file:text-violet-400 hover:file:bg-violet-500/20 transition-all">
+                        <input type="hidden" id="cropped-data" name="cropped_data">
+                    </div>
+                </div>
+
+                <!-- Cropper Modal -->
+                <div id="cropper-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl">
+                        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                            <h3 class="text-xl font-bold text-white">Resmi Kırp</h3>
+                            <button type="button" onclick="closeCropper()" class="text-slate-400 hover:text-white transition-colors">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
+                        <div class="p-6">
+                            <div class="max-h-[50vh] overflow-hidden bg-slate-950 rounded-xl">
+                                <img id="image-to-crop" class="max-w-full block">
+                            </div>
+                        </div>
+                        <div class="p-6 border-t border-slate-800 flex flex-wrap justify-between items-center gap-4">
+                            <div class="flex gap-2">
+                                <button type="button" onclick="cropper.zoom(0.1)" class="p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all">
+                                    <i class="fas fa-search-plus"></i>
+                                </button>
+                                <button type="button" onclick="cropper.zoom(-0.1)" class="p-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-all">
+                                    <i class="fas fa-search-minus"></i>
+                                </button>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="button" onclick="closeCropper()" class="px-6 py-2.5 text-slate-400 hover:text-white transition-all">İptal</button>
+                                <button type="button" onclick="saveCroppedImage()" class="px-8 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20">
+                                    Kırp ve Kaydet
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Hakkımda Yazısı</label>
+                    <div class="text-white">
+                        <textarea id="hakkimda_yazisi" name="hakkimda_yazisi" rows="6" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all resize-none">{{ admin.hakkimda_yazisi or '' }}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- İletişim Bilgileri -->
+        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-xl font-bold text-emerald-400 mb-6 flex items-center">
+                <i class="fas fa-address-book mr-3"></i> İletişim Bilgileri
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">E-posta</label>
+                    <input type="email" name="iletisim_email" value="{{ admin.iletisim_email or '' }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Telefon</label>
+                    <input type="text" name="iletisim_telefon" value="{{ admin.iletisim_telefon or '' }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Konum</label>
+                    <input type="text" name="iletisim_konum" value="{{ admin.iletisim_konum or '' }}" placeholder="Örn: Antalya, Türkiye" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                </div>
+                <div class="flex items-center pt-8">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="telefon_gorunur" class="sr-only peer" {% if admin.telefon_gorunur %}checked{% endif %}>
+                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-violet-600"></div>
+                        <span class="ml-3 text-sm font-medium text-slate-300">Telefon Sitede Görünsün</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sosyal Medya -->
+        <div class="bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl">
+            <h2 class="text-xl font-bold text-blue-400 mb-6 flex items-center">
+                <i class="fas fa-share-alt mr-3"></i> Sosyal Medya Linkleri
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">GitHub URL</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                            <i class="fab fa-github"></i>
+                        </span>
+                        <input type="url" name="sosyal_github" value="{{ admin.sosyal_github or '' }}" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">LinkedIn URL</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">
+                            <i class="fab fa-linkedin"></i>
+                        </span>
+                        <input type="url" name="sosyal_linkedin" value="{{ admin.sosyal_linkedin or '' }}" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <button type="submit" class="px-10 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl shadow-lg shadow-violet-500/20 transition-all transform hover:scale-105">
+                <i class="fas fa-save mr-2"></i> Ayarları Kaydet
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+<script>
+    let cropper;
+    const input = document.getElementById('profil_foto_input');
+    const modal = document.getElementById('cropper-modal');
+    const image = document.getElementById('image-to-crop');
+    const croppedDataInput = document.getElementById('cropped-data');
+
+    input.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                image.src = event.target.result;
+                modal.classList.remove('hidden');
+                if (cropper) {
+                    cropper.destroy();
+                }
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+            };
+            reader.readAsDataURL(files[0]);
+        }
+    });
+
+    function closeCropper() {
+        modal.classList.add('hidden');
+        input.value = '';
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
+    function saveCroppedImage() {
+        if (!cropper) return;
+        const canvas = cropper.getCroppedCanvas({
+            width: 400,
+            height: 400,
+        });
+        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        croppedDataInput.value = base64;
+        
+        // Show preview if exists
+        const previewImg = document.querySelector('img.rounded-full.object-cover');
+        if (previewImg) {
+            previewImg.src = base64;
+        }
+        
+        modal.classList.add('hidden');
+        cropper.destroy();
+    }
+
+    ClassicEditor
+        .create(document.querySelector('#hakkimda_yazisi'), {
+            toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', 'undo', 'redo' ],
+            heading: {
+                options: [
+                    { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                    { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                    { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' }
+                ]
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+{% endblock %}

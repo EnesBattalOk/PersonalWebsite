@@ -1,0 +1,347 @@
+{% extends 'admin_base.html' %}
+
+{% block title %}Planlayıcı{% endblock %}
+
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<div class="space-y-8 pb-20">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-4xl font-bold text-white">Planlayıcı</h1>
+            <p class="text-slate-400 mt-2">Görevlerini yönet, planını takip et.</p>
+        </div>
+        <button onclick="toggleModal(true)" class="bg-violet-600 hover:bg-violet-700 text-white px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-violet-500/20">
+            <i class="fas fa-plus"></i> Yeni Görev
+        </button>
+    </div>
+
+    <!-- TAB BUTONLARI -->
+    <div class="flex gap-2 border-b border-slate-800 overflow-x-auto">
+        <button onclick="switchTab('gunluk')" class="tab-button active px-6 py-3 font-bold text-sm border-b-2 border-violet-500 text-violet-400">
+            <i class="fas fa-calendar-day mr-2"></i> GÜNLÜK
+        </button>
+        <button onclick="switchTab('haftalik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+            <i class="fas fa-calendar-week mr-2"></i> HAFTALIK
+        </button>
+        <button onclick="switchTab('aylik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+            <i class="fas fa-calendar-alt mr-2"></i> AYLIK
+        </button>
+        <button onclick="switchTab('yillik')" class="tab-button px-6 py-3 font-bold text-sm border-b-2 border-transparent text-slate-400 hover:text-slate-300">
+            <i class="fas fa-chart-line mr-2"></i> YILLIK
+        </button>
+    </div>
+
+    <!-- GÜNLÜK TAB -->
+    <div id="tab-gunluk" class="tab-content grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="bg-slate-800/30 p-6 rounded-2xl border border-slate-700 max-h-[700px] overflow-y-auto">
+                <h2 class="text-xl font-bold text-white mb-6">Zaman Çizelgesi</h2>
+                <div class="space-y-3">
+                    {% for hour in range(8, 24) %}
+                    <div class="flex items-start gap-4">
+                        <div class="w-12 pt-2 text-right">
+                            <span class="text-xs font-bold text-slate-500">{{ "%02d"|format(hour) }}:00</span>
+                        </div>
+                        <div class="flex-1">
+                            {% set gorev_for_hour = none %}
+                            {% for g in gunluk_plan %}
+                                {% if g.saat and g.saat.startswith("%02d"|format(hour)) %}
+                                    {% set gorev_for_hour = g %}
+                                {% endif %}
+                            {% endfor %}
+                            {% if gorev_for_hour %}
+                            <div class="bg-violet-600/20 border border-violet-500 p-3 rounded-lg">
+                                <p class="text-white font-semibold text-sm">{{ gorev_for_hour.baslik }}</p>
+                                <p class="text-slate-400 text-xs mt-1">{{ gorev_for_hour.saat }}</p>
+                            </div>
+                            {% else %}
+                            <div class="bg-slate-900/30 border border-dashed border-slate-700 h-10 rounded-lg"></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="bg-gradient-to-br from-violet-500/10 to-purple-500/10 p-6 rounded-2xl border border-violet-500/30 sticky top-20">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <i class="fas fa-star text-yellow-400"></i> Günün Vizyonu
+                </h3>
+                <div class="space-y-3">
+                    {% if gunun_onemlileri %}
+                        {% for gorev in gunun_onemlileri[:3] %}
+                        <div class="bg-slate-900/50 p-3 rounded-lg border-l-4 border-yellow-500">
+                            <p class="text-white font-semibold text-sm">{{ gorev.baslik }}</p>
+                            {% if gorev.saat %}<p class="text-slate-500 text-xs mt-1"><i class="fas fa-clock mr-1"></i> {{ gorev.saat }}</p>{% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <p class="text-slate-500 text-sm text-center py-8">Bugün için önemli iş yok</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HAFTALIK TAB -->
+    <div id="tab-haftalik" class="tab-content hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+            {% set gunler = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'] %}
+            {% for gun in gunler %}
+            <div class="bg-slate-800/30 p-4 rounded-xl border border-slate-700">
+                <h3 class="font-bold text-violet-400 text-sm mb-3 text-center">{{ gun }}</h3>
+                <div class="haftalik-dropzone space-y-2 min-h-[300px] bg-slate-900/30 rounded-lg p-2 border-2 border-dashed border-slate-700" data-gun="{{ gun }}">
+                    {% if haftalik_plan.get(gun) %}
+                        {% for gorev in haftalik_plan[gun] %}
+                        <div class="bg-violet-600/30 border border-violet-500/50 p-2 rounded text-xs text-white font-semibold cursor-move hover:bg-violet-600/50 transition-all" data-id="{{ gorev.id }}" data-tarih="{{ gorev.son_tarih.strftime('%Y-%m-%d') if gorev.son_tarih else '' }}">
+                            {{ gorev.baslik }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- AYLIK TAB -->
+    <div id="tab-aylik" class="tab-content hidden">
+        <div class="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 shadow-xl min-h-[700px]">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- YILLIK TAB -->
+    <div id="tab-yillik" class="tab-content hidden">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gradient-to-br from-emerald-600/20 to-emerald-900/20 p-6 rounded-2xl border border-emerald-500/30">
+                <h3 class="text-2xl font-bold text-emerald-400 mb-4">🌱 Q1</h3>
+                <p class="text-slate-500 text-xs mb-4">Ocak - Mart</p>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                    {% for hedef in yillik_hedefler %}
+                        {% if hedef.ceyrek == 1 %}
+                        <div class="bg-slate-950/50 p-2 rounded text-xs text-slate-300 border-l-2 border-emerald-500">
+                            {{ hedef.baslik }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-yellow-600/20 to-yellow-900/20 p-6 rounded-2xl border border-yellow-500/30">
+                <h3 class="text-2xl font-bold text-yellow-400 mb-4">☀️ Q2</h3>
+                <p class="text-slate-500 text-xs mb-4">Nisan - Haziran</p>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                    {% for hedef in yillik_hedefler %}
+                        {% if hedef.ceyrek == 2 %}
+                        <div class="bg-slate-950/50 p-2 rounded text-xs text-slate-300 border-l-2 border-yellow-500">
+                            {{ hedef.baslik }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-orange-600/20 to-orange-900/20 p-6 rounded-2xl border border-orange-500/30">
+                <h3 class="text-2xl font-bold text-orange-400 mb-4">🍂 Q3</h3>
+                <p class="text-slate-500 text-xs mb-4">Temmuz - Eylül</p>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                    {% for hedef in yillik_hedefler %}
+                        {% if hedef.ceyrek == 3 %}
+                        <div class="bg-slate-950/50 p-2 rounded text-xs text-slate-300 border-l-2 border-orange-500">
+                            {{ hedef.baslik }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-cyan-600/20 to-cyan-900/20 p-6 rounded-2xl border border-cyan-500/30">
+                <h3 class="text-2xl font-bold text-cyan-400 mb-4">❄️ Q4</h3>
+                <p class="text-slate-500 text-xs mb-4">Ekim - Aralık</p>
+                <div class="space-y-2 max-h-96 overflow-y-auto">
+                    {% for hedef in yillik_hedefler %}
+                        {% if hedef.ceyrek == 4 %}
+                        <div class="bg-slate-950/50 p-2 rounded text-xs text-slate-300 border-l-2 border-cyan-500">
+                            {{ hedef.baslik }}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Yeni Görev -->
+<div id="taskModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-3xl shadow-2xl scale-95 transition-all" id="modalContent">
+        <div class="p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-white">Yeni Görev</h2>
+                <button onclick="toggleModal(false)" class="text-slate-500 hover:text-white">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <form action="{{ url_for('add_planner_task') }}" method="POST" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Başlık</label>
+                    <input type="text" name="baslik" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Açıklama</label>
+                    <textarea name="aciklama" rows="3" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Öncelik</label>
+                        <select name="oncelik" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50">
+                            <option value="DUSUK">Düşük</option>
+                            <option value="NORMAL" selected>Normal</option>
+                            <option value="YUKSEK">Yüksek</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Tarih</label>
+                        <input type="date" name="son_tarih" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Saat</label>
+                    <input type="time" name="saat" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50">
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="is_hedef" name="kategori" value="HEDEF" class="w-4 h-4 rounded cursor-pointer" onchange="document.getElementById('quarter-field').classList.toggle('hidden')">
+                    <label for="is_hedef" class="text-white font-semibold cursor-pointer">Yıllık hedef mi?</label>
+                </div>
+
+                <div id="quarter-field" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Çeyrek</label>
+                    <select name="ceyrek" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500/50">
+                        <option value="">Seçiniz...</option>
+                        <option value="1">Q1 (Ocak - Mart)</option>
+                        <option value="2">Q2 (Nisan - Haziran)</option>
+                        <option value="3">Q3 (Temmuz - Eylül)</option>
+                        <option value="4">Q4 (Ekim - Aralık)</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" id="is_important" name="onemli_mi" value="True" class="w-4 h-4 rounded cursor-pointer">
+                    <label for="is_important" class="text-white font-semibold cursor-pointer">Günün en önemli işi</label>
+                </div>
+
+                <button type="submit" class="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-4 rounded-xl transition-all uppercase tracking-widest shadow-lg shadow-violet-500/20">
+                    Oluştur
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fc { color: #e2e8f0; font-family: 'Outfit', sans-serif; }
+    .fc-theme-standard td, .fc-theme-standard th { border-color: #1e293b; }
+    .fc-daygrid-day { background-color: #0f172a; }
+    .fc-button-primary { background-color: #7c3aed !important; border-color: #7c3aed !important; }
+    .fc-event { background-color: #7c3aed !important; border: none !important; }
+    .tab-button.active { border-b-color: #8b5cf6; color: #8b5cf6; }
+</style>
+
+<script>
+    let calendar;
+
+    function switchTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('.tab-button').forEach(el => {
+            el.classList.remove('border-violet-500', 'text-violet-400', 'active');
+            el.classList.add('border-transparent', 'text-slate-400');
+        });
+        document.getElementById('tab-' + tab).classList.remove('hidden');
+        event.target.closest('.tab-button').classList.add('border-violet-500', 'text-violet-400', 'active');
+
+        if (tab === 'aylik') setTimeout(() => { if (!calendar) initCalendar(); else calendar.render(); }, 100);
+    }
+
+    function initCalendar() {
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'tr',
+            headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+            events: [
+                {% for gorev in tum_gorevler %}
+                {% if gorev.son_tarih %}{
+                    title: '{{ gorev.baslik }}',
+                    start: '{{ gorev.son_tarih.strftime("%Y-%m-%d") }}',
+                    color: '{% if gorev.durum == "BITTI" %}#10b981{% elif gorev.oncelik == "YUKSEK" %}#ef4444{% elif gorev.oncelik == "NORMAL" %}#eab308{% else %}#3b82f6{% endif %}',
+                },{% endif %}
+                {% endfor %}
+            ],
+        });
+        calendar.render();
+    }
+
+    function toggleModal(show) {
+        const modal = document.getElementById('taskModal');
+        const content = document.getElementById('modalContent');
+        if (show) {
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('scale-95'), 10);
+        } else {
+            content.classList.add('scale-95');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+    }
+
+    // Haftalık drag-drop
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.haftalik-dropzone').forEach(zone => {
+            Sortable.create(zone, {
+                group: 'haftalik',
+                animation: 150,
+                ghostClass: 'bg-violet-500/20',
+                onEnd: function(evt) {
+                    const taskId = evt.item.getAttribute('data-id');
+                    const yeni_gun = evt.to.getAttribute('data-gun');
+                    const gunler = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+                    const gun_index = gunler.indexOf(yeni_gun);
+                    
+                    if (gun_index !== -1) {
+                        const bugun = new Date();
+                        const hafta_basla = new Date(bugun);
+                        hafta_basla.setDate(bugun.getDate() - bugun.getDay());
+                        const yeni_tarih = new Date(hafta_basla);
+                        yeni_tarih.setDate(hafta_basla.getDate() + gun_index);
+                        
+                        const yeni_tarih_str = yeni_tarih.toISOString().split('T')[0];
+                        
+                        fetch('/admin/planner/update_tarih/' + taskId, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ yeni_tarih: yeni_tarih_str })
+                        }).then(r => r.json()).then(d => {
+                            if (!d.success) alert('Hata: ' + d.error);
+                        });
+                    }
+                }
+            });
+        });
+    });
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('taskModal');
+        if (event.target == modal) toggleModal(false);
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Okunan Kitaplar{% endblock %}
+
+{% block content %}
+<div class="pb-20">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-white">Okunan Kitaplar ({{ secili_yil_display }})</h1>
+        <button onclick="openModal()" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-105">
+            <i class="fas fa-plus mr-2"></i> Yeni Kitap Ekle
+        </button>
+    </div>
+
+    <!-- Year Filter Bar -->
+    <div class="flex gap-2 mb-6 pb-2 overflow-x-auto no-scrollbar">
+        <a href="{{ url_for('admin_books', yil='genel') }}" 
+           class="px-4 py-2 rounded-full text-sm font-bold border transition-all whitespace-nowrap
+           {% if secili_yil == 'genel' %}bg-violet-600 border-violet-600 text-white{% else %}bg-slate-800/50 border-slate-700 text-slate-400 hover:border-violet-500{% endif %}">
+            GENEL
+        </a>
+        {% for y in yillar %}
+        <a href="{{ url_for('admin_books', yil=y) }}" 
+           class="px-4 py-2 rounded-full text-sm font-bold border transition-all whitespace-nowrap
+           {% if secili_yil|string == y|string %}bg-violet-600 border-violet-600 text-white{% else %}bg-slate-800/50 border-slate-700 text-slate-400 hover:border-violet-500{% endif %}">
+            {{ y }}
+        </a>
+        {% endfor %}
+    </div>
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex items-center gap-4">
+            <div class="w-12 h-12 bg-violet-500/10 rounded-xl flex items-center justify-center border border-violet-500/20">
+                <i class="fas fa-book text-violet-400 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-400 text-sm font-medium">Toplam Kitap</p>
+                <h3 class="text-2xl font-bold text-white">{{ toplam_kitap }}</h3>
+            </div>
+        </div>
+        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex items-center gap-4">
+            <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                <i class="fas fa-file-lines text-emerald-400 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-400 text-sm font-medium">Toplam Sayfa</p>
+                <h3 class="text-2xl font-bold text-white">{{ "{:,}".format(toplam_sayfa).replace(',', '.') }}</h3>
+            </div>
+        </div>
+        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 shadow-xl flex items-center gap-4">
+            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                <i class="fas fa-feather text-blue-400 text-xl"></i>
+            </div>
+            <div>
+                <p class="text-slate-400 text-sm font-medium">Toplam Yazar</p>
+                <h3 class="text-2xl font-bold text-white">{{ toplam_yazar }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Table -->
+    <div class="bg-slate-800/50 rounded-2xl border border-slate-700 shadow-xl overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-800/80 border-b border-slate-700">
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">#</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Kitap Adı</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Yazar</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Sayfa</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Okunma Tarihi</th>
+                        <th class="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">İşlem</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800">
+                    {% for book in books %}
+                    <tr class="hover:bg-slate-800/50 transition-colors">
+                        <td class="px-6 py-4 text-slate-500 font-mono text-sm">{{ loop.index }}</td>
+                        <td class="px-6 py-4 text-white font-medium">{{ book.kitap_adi }}</td>
+                        <td class="px-6 py-4 text-slate-400">{{ book.yazar or '-' }}</td>
+                        <td class="px-6 py-4 text-slate-400">{{ book.sayfa_sayisi or '-' }}</td>
+                        <td class="px-6 py-4 text-slate-400 text-sm">{{ book.okunma_tarihi.strftime('%d.%m.%Y') if book.okunma_tarihi else '-' }}</td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="{{ url_for('delete_book', id=book.id) }}" onclick="return confirm('Bu kitabı silmek istediğinize emin misiniz?')" class="text-slate-500 hover:text-red-500 transition-colors p-2">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not books %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-10 text-center text-slate-500 italic">Henüz kitap eklenmemiş.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Book Modal -->
+<div id="add-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl">
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white">Yeni Kitap Ekle</h3>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        <form action="{{ url_for('add_book') }}" method="POST" class="p-6 space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Kitap Adı</label>
+                <input type="text" name="kitap_adi" required class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Yazar</label>
+                <input type="text" name="yazar" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Sayfa Sayısı</label>
+                    <input type="number" name="sayfa_sayisi" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Okunma Tarihi</label>
+                    <input type="date" name="okunma_tarihi" class="w-full px-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+            </div>
+            <div class="flex gap-4 pt-4">
+                <button type="button" onclick="closeModal()" class="flex-1 py-3 text-slate-400 hover:text-white transition-all">Vazgeç</button>
+                <button type="submit" class="flex-1 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20">Kaydet</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openModal() {
+        document.getElementById('add-modal').classList.remove('hidden');
+    }
+    function closeModal() {
+        document.getElementById('add-modal').classList.add('hidden');
+    }
+</script>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+</style>
+{% endblock %}

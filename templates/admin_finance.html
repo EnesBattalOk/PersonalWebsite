@@ -1,0 +1,354 @@
+{% extends 'admin_base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-950 text-slate-200 font-['Outfit']">
+    <div class="container mx-auto px-4 py-8">
+        
+        <!-- HERO SECTION: NET SERVET -->
+        <div class="flex flex-col items-center justify-center mb-16 py-12 bg-slate-900/50 rounded-3xl border border-emerald-500/20 shadow-[0_0_50px_rgba(16,185,129,0.05)]">
+            <h2 class="text-slate-400 uppercase tracking-[0.2em] text-sm font-semibold mb-1">Net Servet</h2>
+            <p class="text-[10px] text-slate-500 font-medium uppercase tracking-widest mb-4">(Serbest Piyasa Alış Fiyatları Baz Alınmıştır)</p>
+            <div class="text-6xl md:text-8xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.5)] flex items-baseline gap-2">
+                <span>{{ "{:,.2f}".format(net_servet) }}</span>
+                <span class="text-3xl md:text-4xl text-emerald-500/70">₺</span>
+            </div>
+            <div class="mt-4 flex items-center gap-2 text-emerald-500/60 bg-emerald-500/5 px-4 py-1 rounded-full border border-emerald-500/10">
+                <i class="fas fa-chart-line"></i>
+                <span class="text-xs font-medium uppercase tracking-wider">Tahmini Piyasa Değeri</span>
+            </div>
+        </div>
+
+        <!-- VARLIK KARTLARI -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <!-- NAKİT -->
+            <div class="group bg-slate-900 rounded-2xl border border-emerald-500/20 hover:border-emerald-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(16,185,129,0.1)] overflow-hidden">
+                <div class="p-6 pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-wallet text-2xl"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">TL / NAKİT</span>
+                    </div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Toplam Nakit</h3>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['NAKIT']['toplam']) }}</p>
+                        <span class="text-sm text-emerald-500">₺</span>
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['NAKIT']['fiziksel']) }} ₺</span></div>
+                    <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['NAKIT']['banka']) }} ₺</span></div>
+                </div>
+            </div>
+
+            <!-- ALTIN -->
+            <div class="group bg-slate-900 rounded-2xl border border-yellow-500/20 hover:border-yellow-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(234,179,8,0.1)] overflow-hidden">
+                <div class="p-6 pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-coins text-2xl"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">ALTIN (GRAM)</span>
+                    </div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Altın Rezervi</h3>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['ALTIN']['toplam']) }}</p>
+                        <span class="text-xs text-yellow-500">gr (≈ {{ "{:,.0f}".format(varliklar['ALTIN']['toplam'] * canli_kurlar['ALTIN']) }} ₺)</span>
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['ALTIN']['fiziksel']) }} gr</span></div>
+                    <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['ALTIN']['banka']) }} gr</span></div>
+                </div>
+            </div>
+
+            <!-- DÖVİZ -->
+            <div class="group bg-slate-900 rounded-2xl border border-blue-500/20 hover:border-blue-500/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(59,130,246,0.1)] overflow-hidden">
+                <div class="p-6 pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-dollar-sign text-2xl"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">DÖVİZ (USD)</span>
+                    </div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Dolar Hesabı</h3>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['USD']['toplam']) }}</p>
+                        <span class="text-xs text-blue-500">$ (≈ {{ "{:,.0f}".format(varliklar['USD']['toplam'] * canli_kurlar['USD']) }} ₺)</span>
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['USD']['fiziksel']) }} $</span></div>
+                    <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.0f}".format(varliklar['USD']['banka']) }} $</span></div>
+                </div>
+            </div>
+
+            <!-- GÜMÜŞ -->
+            <div class="group bg-slate-900 rounded-2xl border border-slate-400/20 hover:border-slate-400/50 transition-all duration-500 hover:shadow-[0_0_30px_rgba(148,163,184,0.1)] overflow-hidden">
+                <div class="p-6 pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-slate-400/10 rounded-xl text-slate-400 group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-gem text-2xl"></i>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">GÜMÜŞ (GRAM)</span>
+                    </div>
+                    <h3 class="text-slate-400 text-xs font-bold uppercase mb-1">Gümüş Rezervi</h3>
+                    <div class="flex items-baseline gap-2">
+                        <p class="text-2xl font-bold text-white tracking-tight">{{ "{:,.2f}".format(varliklar['GUMUS']['toplam']) }}</p>
+                        <span class="text-xs text-slate-400">gr (≈ {{ "{:,.0f}".format(varliklar['GUMUS']['toplam'] * canli_kurlar['GUMUS']) }} ₺)</span>
+                    </div>
+                </div>
+                <div class="px-6 py-3 bg-slate-950/50 border-t border-slate-800/50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                    <div class="text-slate-500">🏠 Fiziksel: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['GUMUS']['fiziksel']) }} gr</span></div>
+                    <div class="text-slate-500">🏦 Banka: <span class="text-slate-300">{{ "{:,.1f}".format(varliklar['GUMUS']['banka']) }} gr</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SON HAREKETLER TABLE -->
+        <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-2xl">
+            <div class="px-8 py-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+                <h2 class="text-xl font-bold text-white flex items-center gap-3">
+                    <span class="w-2 h-8 bg-yellow-500 rounded-full"></span>
+                    Kasa Defteri
+                </h2>
+                <span class="text-xs text-slate-500 font-medium uppercase tracking-widest">Son 20 İşlem</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="text-slate-500 text-[10px] font-bold uppercase tracking-widest bg-slate-950/50">
+                            <th class="px-8 py-4 text-left">Zaman Damgası</th>
+                            <th class="px-8 py-4 text-left">İşlem Detayı</th>
+                            <th class="px-8 py-4 text-left">Varlık Sınıfı</th>
+                            <th class="px-8 py-4 text-right">Miktar</th>
+                            <th class="px-8 py-4 text-right">Maliyet (TL)</th>
+                            <th class="px-8 py-4 text-left">Banka</th>
+                            <th class="px-8 py-4 text-center">Eylem</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-800/50">
+                        {% for islem in islemler %}
+                        <tr class="hover:bg-slate-800/20 transition-colors group">
+                            <td class="px-8 py-5 text-sm text-slate-400">
+                                {{ islem.tarih.strftime('%d.%m.%Y') }}
+                                <p class="text-[10px] text-slate-600 font-mono">{{ islem.tarih.strftime('%H:%M') }}</p>
+                            </td>
+                            <td class="px-8 py-5">
+                                <span class="px-2 py-1 rounded-md text-[10px] font-black tracking-tighter
+                                    {% if islem.islem_turu == 'GELIR' %}bg-emerald-500/10 text-emerald-500
+                                    {% elif islem.islem_turu == 'GIDER' %}bg-red-500/10 text-red-500
+                                    {% elif islem.islem_turu == 'VARLIK_ALIM' %}bg-yellow-500/10 text-yellow-500
+                                    {% else %}bg-blue-500/10 text-blue-500{% endif %}">
+                                    {{ islem.islem_turu }}
+                                </span>
+                                <p class="text-xs text-slate-300 mt-2 font-medium">{{ islem.aciklama }}</p>
+                            </td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full {% if islem.kategori == 'ALTIN' %}bg-yellow-500{% elif islem.kategori == 'GUMUS' %}bg-slate-400{% elif islem.kategori == 'DOVIZ' %}bg-blue-500{% else %}bg-emerald-500{% endif %}"></div>
+                                    <span class="text-xs text-slate-400 font-semibold">{{ islem.kategori }}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 text-right text-sm font-bold text-slate-300">
+                                {% if islem.miktar > 0 %}
+                                    {{ "{:,.2f}".format(islem.miktar) }}
+                                    <span class="text-[10px] text-slate-500 font-normal">
+                                        {% if islem.kategori in ['ALTIN', 'GUMUS'] %}gr{% elif islem.kategori == 'DOVIZ' %}${% else %}birim{% endif %}
+                                    </span>
+                                {% else %}-{% endif %}
+                            </td>
+                            <td class="px-8 py-5 text-right font-mono text-sm {% if islem.islem_turu in ['GELIR', 'VARLIK_SATIM'] %}text-emerald-400{% else %}text-red-400{% endif %}">
+                                {{ "{:,.2f}".format(islem.tutar_tl) }} ₺
+                            </td>
+                            <td class="px-8 py-5 text-sm text-slate-400">
+                                {{ islem.banka if islem.banka else '-' }}
+                            </td>
+                            <td class="px-8 py-5 text-center">
+                                <a href="{{ url_for('delete_finance_item', id=islem.id) }}" 
+                                   onclick="return confirm('Silinsin mi?')"
+                                   class="text-slate-600 hover:text-red-500 transition-colors">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not islemler %}
+                        <tr>
+                            <td colspan="6" class="px-8 py-20 text-center">
+                                <div class="text-slate-600 flex flex-col items-center gap-4">
+                                    <i class="fas fa-inbox text-5xl opacity-20"></i>
+                                    <p class="text-sm font-medium uppercase tracking-widest opacity-50">Henüz bir veri akışı bulunmuyor</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- HIZLI İŞLEM BUTONU -->
+    <button onclick="toggleModal(true)" class="fixed bottom-8 right-8 w-16 h-16 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-full shadow-[0_0_30px_rgba(234,179,8,0.4)] transition-all duration-300 hover:scale-110 active:scale-95 flex items-center justify-center z-40">
+        <i class="fas fa-plus text-2xl"></i>
+    </button>
+
+    <!-- MODAL -->
+    <div id="financeModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-emerald-500/30 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden scale-90 transition-transform duration-300" id="modalContent">
+            <div class="p-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-2xl font-bold text-white">Yeni İşlem</h2>
+                    <button onclick="toggleModal(false)" class="text-slate-500 hover:text-white transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <form action="{{ url_for('add_finance_item') }}" method="POST" class="space-y-6">
+                    <div class="space-y-4">
+                        <!-- İşlem Türü -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">İşlem Türü</label>
+                            <select name="islem_turu" id="islem_turu" onchange="toggleFields()" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors">
+                                <option value="GELIR">Gelir</option>
+                                <option value="GIDER">Gider</option>
+                                <option value="VARLIK_ALIM">Varlık Alımı</option>
+                                <option value="VARLIK_SATIM">Varlık Satışı</option>
+                            </select>
+                        </div>
+
+                        <!-- Senaryo A: Gelir/Gider Alanları -->
+                        <div id="gelirGiderFields">
+                            <div class="mb-4">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Tutar (TL)</label>
+                                <input type="number" step="0.01" name="tutar_tl" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors" placeholder="0.00">
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Kategori</label>
+                                <select name="kategori" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors">
+                                    <option value="MAAS">Maaş</option>
+                                    <option value="FATURA">Fatura</option>
+                                    <option value="KIRA">Kira</option>
+                                    <option value="MUTFAK">Mutfak/Market</option>
+                                    <option value="DIGER">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Senaryo B: Varlık Alanları (Gizli) -->
+                        <div id="varlikFields" class="hidden space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Varlık Türü</label>
+                                <select name="doviz_turu" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors">
+                                    <option value="ALTIN">Altın (Gram)</option>
+                                    <option value="GUMUS">Gümüş (Gram)</option>
+                                    <option value="USD">Dolar (USD)</option>
+                                    <option value="EUR">Euro (EUR)</option>
+                                    <option value="KRIPTO">Kripto / Dijital</option>
+                                </select>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Miktar</label>
+                                    <input type="number" step="0.0001" name="miktar" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors" placeholder="0.0000">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Toplam Tutar (TL)</label>
+                                    <input type="number" step="0.01" name="v_tutar_tl" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Konum</label>
+                                <div class="flex gap-6 py-2">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="varlik_konumu" value="FIZIKSEL" checked onchange="toggleBankSelect()" class="w-4 h-4 accent-emerald-500">
+                                        <span class="text-sm text-slate-300">Fiziksel</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="varlik_konumu" value="BANKA" onchange="toggleBankSelect()" class="w-4 h-4 accent-emerald-500">
+                                        <span class="text-sm text-slate-300">Banka</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="bankaSelectField" class="hidden">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Banka Adı</label>
+                                <select name="banka" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Ziraat Bankası">Ziraat Bankası</option>
+                                    <option value="Garanti BBVA">Garanti BBVA</option>
+                                    <option value="İş Bankası">İş Bankası</option>
+                                    <option value="Akbank">Akbank</option>
+                                    <option value="Yapı Kredi">Yapı Kredi</option>
+                                    <option value="Kuveyt Türk">Kuveyt Türk</option>
+                                    <option value="Halkbank">Halkbank</option>
+                                    <option value="Vakıfbank">Vakıfbank</option>
+                                    <option value="QNB Finansbank">QNB Finansbank</option>
+                                    <option value="Midas">Midas</option>
+                                    <option value="Binance">Binance</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Açıklama -->
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Açıklama</label>
+                            <textarea name="aciklama" rows="2" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500/50 transition-colors" placeholder="Detaylar..."></textarea>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-4 rounded-xl transition-all duration-300 uppercase tracking-widest shadow-lg shadow-emerald-500/20 mt-4">
+                        Sisteme İşle
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal(show) {
+        const modal = document.getElementById('financeModal');
+        const content = document.getElementById('modalContent');
+        if (show) {
+            modal.classList.remove('hidden');
+            setTimeout(() => content.classList.remove('scale-90'), 10);
+        } else {
+            content.classList.add('scale-90');
+            setTimeout(() => modal.classList.add('hidden'), 200);
+        }
+    }
+
+    function toggleFields() {
+        const type = document.getElementById('islem_turu').value;
+        const vFields = document.getElementById('varlikFields');
+        const ggFields = document.getElementById('gelirGiderFields');
+        
+        if (type === 'VARLIK_ALIM' || type === 'VARLIK_SATIM') {
+            vFields.classList.remove('hidden');
+            ggFields.classList.add('hidden');
+        } else {
+            vFields.classList.add('hidden');
+            ggFields.classList.remove('hidden');
+        }
+    }
+
+    function toggleBankSelect() {
+        const konum = document.querySelector('input[name="varlik_konumu"]:checked').value;
+        const bankaField = document.getElementById('bankaSelectField');
+        if (konum === 'BANKA') {
+            bankaField.classList.remove('hidden');
+        } else {
+            bankaField.classList.add('hidden');
+        }
+    }
+
+    // Modal dışına tıklayınca kapatma
+    window.onclick = function(event) {
+        const modal = document.getElementById('financeModal');
+        if (event.target == modal) {
+            toggleModal(false);
+        }
+    }
+</script>
+{% endblock %}

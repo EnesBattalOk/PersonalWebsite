@@ -1,0 +1,50 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Kayıt Düzenle{% endblock %}
+
+{% block content %}
+<div class="pb-20">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-white">Kayıt Düzenle</h1>
+        <a href="{{ url_for('admin_resume') }}" class="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-600 transition-all">
+            <i class="fas fa-arrow-left mr-2"></i> Geri Dön
+        </a>
+    </div>
+
+    <div class="max-w-2xl bg-slate-800/50 p-8 rounded-2xl border border-slate-700 shadow-xl mx-auto">
+        <form action="{{ url_for('edit_resume', id=item.id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Tip</label>
+                <select name="tip" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+                    <option value="Egitim" {% if item.tip == 'Egitim' %}selected{% endif %}>Eğitim</option>
+                    <option value="Deneyim" {% if item.tip == 'Deneyim' %}selected{% endif %}>Deneyim</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Logo</label>
+                <div class="flex items-center gap-4">
+                    {% if item.logo_url %}
+                    <img src="{{ item.logo_url }}" class="w-12 h-12 rounded object-cover border border-slate-700">
+                    {% endif %}
+                    <input type="file" name="logo" class="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-violet-500/10 file:text-violet-400">
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Başlık / Kurum</label>
+                <input type="text" name="baslik" value="{{ item.baslik }}" required class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Tarih Aralığı</label>
+                <input type="text" name="tarih_araligi" value="{{ item.tarih_araligi or '' }}" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-400 mb-2">Açıklama</label>
+                <textarea name="notlar" rows="4" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none resize-none">{{ item.notlar or '' }}</textarea>
+            </div>
+            <button type="submit" class="w-full py-4 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-[1.02]">
+                <i class="fas fa-save mr-2"></i> Değişiklikleri Kaydet
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

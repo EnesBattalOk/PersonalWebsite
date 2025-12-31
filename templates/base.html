@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Enes Battal Ok | Portfolio{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100%;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151e32',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        violet: {
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-900 text-slate-200 min-h-screen flex flex-col">
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="container mx-auto px-6 h-20 flex justify-between items-center">
+        
+        <a href="/" class="text-2xl font-bold text-white tracking-wider">
+            Enes Battal <span class="text-violet-500">Ok</span>
+        </a>
+
+        <div class="flex items-center gap-6">
+            
+            <div class="hidden lg:flex items-center gap-6">
+                <a href="/#hakkimda" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">HAKKIMDA</a>
+                <a href="/#yetenekler" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">YETENEKLER</a>
+                <a href="/#projeler" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">ÇALIŞMALAR</a>
+                <a href="/#iletisim" class="text-sm font-medium text-slate-300 hover:text-violet-500 transition-colors">İLETİŞİM</a>
+            </div>
+
+            <div class="hidden md:flex items-center gap-3">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('dashboard') }}" class="bg-violet-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-violet-700 transition-all">
+                    Panel
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="border border-slate-600 text-slate-300 px-4 py-2 rounded-lg text-sm font-bold hover:border-violet-500 hover:text-violet-500 transition-all">
+                    Giriş
+                </a>
+                {% endif %}
+            </div>
+
+            <button id="mobile-trigger" class="lg:hidden text-white text-3xl focus:outline-none ml-2">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </div>
+    </div>
+</nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow pt-20">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mx-auto px-4 mb-4">
+                    {% for category, message in messages %}
+                        <div class="p-4 rounded-lg {% if category == 'success' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}bg-red-500/10 text-red-400 border border-red-500/20{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 mt-20 py-8">
+        <div class="container mx-auto px-4 text-center text-slate-500 text-sm">
+            <p>&copy; 2024 Enes Battal Ok. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+<div id="mobile-menu-overlay" class="fixed inset-0 bg-black/80 z-[90] hidden transition-opacity duration-300"></div>
+
+<div id="mobile-menu-panel" class="fixed top-0 right-0 w-72 h-full bg-slate-900 border-l border-slate-800 z-[100] transform translate-x-full transition-transform duration-300 shadow-2xl flex flex-col">
+    
+    <div class="flex items-center justify-between p-6 border-b border-slate-800">
+        <span class="text-white font-bold text-lg">Menü</span>
+        <button id="mobile-close" class="text-slate-400 hover:text-white text-2xl">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="flex flex-col p-6 gap-4">
+        <a href="/" class="text-slate-300 hover:text-violet-500 text-lg">Anasayfa</a>
+        <a href="/#hakkimda" class="text-slate-300 hover:text-violet-500 text-lg">Hakkımda</a>
+        <a href="/#yetenekler" class="text-slate-300 hover:text-violet-500 text-lg">Yetenekler</a>
+        <a href="/#projeler" class="text-slate-300 hover:text-violet-500 text-lg">Çalışmalar</a>
+        <a href="/#iletisim" class="text-slate-300 hover:text-violet-500 text-lg">İletişim</a>
+        
+        <div class="h-px bg-slate-800 my-2"></div>
+        
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('dashboard') }}" class="text-violet-400 font-bold">Yönetim Paneli</a>
+        <a href="{{ url_for('logout') }}" class="text-red-400">Çıkış Yap</a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="text-violet-500 font-bold">Giriş Yap</a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    const trigger = document.getElementById('mobile-trigger');
+    const closeBtn = document.getElementById('mobile-close');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const panel = document.getElementById('mobile-menu-panel');
+
+    function toggleMenu() {
+        panel.classList.toggle('translate-x-full');
+        overlay.classList.toggle('hidden');
+    }
+
+    if(trigger) trigger.addEventListener('click', toggleMenu);
+    if(closeBtn) closeBtn.addEventListener('click', toggleMenu);
+    if(overlay) overlay.addEventListener('click', toggleMenu);
+</script>
+
+</body>
+</html>

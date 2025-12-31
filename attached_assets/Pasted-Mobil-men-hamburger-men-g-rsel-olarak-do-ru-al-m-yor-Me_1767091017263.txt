@@ -1,0 +1,113 @@
+Mobil menü (hamburger menü) görsel olarak doğru çalışmıyor. Mevcut yapıyı tamamen silip, sağdan kayarak gelen (slide-over) yapıyı garanti altına alan aşağıdaki kodu kullanacağız.
+
+Lütfen 'templates/base.html' dosyasındaki `<header>` veya `<nav>` etiketleri arasındaki TÜM içeriği sil ve yerine sadece aşağıdaki kod bloğunu yapıştır:
+
+```html
+<nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        
+        <a href="/" class="text-2xl font-bold text-white font-['Alegreya_SC']">
+            Tunahan <span class="text-violet-500">Cengiz</span>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-8">
+            <a href="/#hakkimda" class="text-slate-300 hover:text-violet-500 transition-colors">Hakkımda</a>
+            <a href="/#yetenekler" class="text-slate-300 hover:text-violet-500 transition-colors">Yetenekler</a>
+            <a href="/#projeler" class="text-slate-300 hover:text-violet-500 transition-colors">Çalışmalarım</a>
+            <a href="/#egitim-kariyer" class="text-slate-300 hover:text-violet-500 transition-colors">Eğitim & Kariyer</a>
+            <a href="/#iletisim" class="text-slate-300 hover:text-violet-500 transition-colors">İletişim</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div class="hidden lg:block">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('admin_dashboard') }}" class="bg-violet-600/20 text-violet-400 px-4 py-2 rounded-lg hover:bg-violet-600 hover:text-white transition-all mr-2">
+                    <i class="fa-solid fa-gauge mr-2"></i>Panel
+                </a>
+                <a href="{{ url_for('logout') }}" class="text-slate-400 hover:text-red-400 transition-all">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </a>
+                {% else %}
+                <a href="{{ url_for('login') }}" class="border border-violet-500 text-violet-500 px-4 py-2 rounded-lg hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_15px_rgba(124,58,237,0.3)]">
+                    <i class="fa-solid fa-lock mr-2"></i>Giriş Yap
+                </a>
+                {% endif %}
+            </div>
+
+            <button id="mobile-menu-toggle" class="lg:hidden text-slate-300 text-2xl focus:outline-none relative z-50">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div id="mobile-backdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] hidden transition-opacity duration-300 opacity-0"></div>
+
+<div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-[300px] bg-slate-900 border-l border-violet-500/30 shadow-2xl z-[70] transform translate-x-full transition-transform duration-300 ease-in-out">
+    <div class="p-6 h-full flex flex-col">
+        <div class="flex justify-between items-center mb-8">
+            <h3 class="text-xl font-bold text-white font-['Alegreya_SC']">Menü</h3>
+            <button id="mobile-menu-close" class="text-slate-400 hover:text-white text-2xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="flex flex-col gap-2 flex-1 overflow-y-auto">
+            <a href="/#hakkimda" class="mobile-link flex items-center gap-4 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+                <i class="fa-solid fa-user text-violet-500 w-6"></i> Hakkımda
+            </a>
+            <a href="/#yetenekler" class="mobile-link flex items-center gap-4 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+                <i class="fa-solid fa-wand-magic-sparkles text-violet-500 w-6"></i> Yetenekler
+            </a>
+            <a href="/#projeler" class="mobile-link flex items-center gap-4 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+                <i class="fa-solid fa-code text-violet-500 w-6"></i> Çalışmalarım
+            </a>
+            <a href="/#egitim-kariyer" class="mobile-link flex items-center gap-4 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+                <i class="fa-solid fa-graduation-cap text-violet-500 w-6"></i> Eğitim & Kariyer
+            </a>
+            <a href="/#iletisim" class="mobile-link flex items-center gap-4 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+                <i class="fa-solid fa-paper-plane text-violet-500 w-6"></i> İletişim
+            </a>
+        </div>
+
+        <div class="mt-auto pt-6 border-t border-slate-800">
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('admin_dashboard') }}" class="flex items-center justify-center gap-2 w-full bg-violet-600 text-white p-3 rounded-xl mb-3">
+                <i class="fa-solid fa-gauge"></i> Yönetim Paneli
+            </a>
+            <a href="{{ url_for('logout') }}" class="flex items-center justify-center gap-2 w-full border border-slate-700 text-slate-300 p-3 rounded-xl hover:bg-red-500/10 hover:text-red-500 hover:border-red-500 translation-all">
+                <i class="fa-solid fa-right-from-bracket"></i> Çıkış Yap
+            </a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="flex items-center justify-center gap-2 w-full border-2 border-violet-500 text-violet-500 p-3 rounded-xl hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_15px_rgba(124,58,237,0.2)]">
+                <i class="fa-solid fa-lock"></i> Giriş Yap
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<script>
+    const toggleBtn = document.getElementById('mobile-menu-toggle');
+    const closeBtn = document.getElementById('mobile-menu-close');
+    const panel = document.getElementById('mobile-menu-panel');
+    const backdrop = document.getElementById('mobile-menu-backdrop');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    function openMenu() {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => backdrop.classList.add('opacity-100'), 10); // Fade-in
+        panel.classList.remove('translate-x-full');
+    }
+
+    function closeMenu() {
+        backdrop.classList.remove('opacity-100');
+        panel.classList.add('translate-x-full');
+        setTimeout(() => backdrop.classList.add('hidden'), 300); // Fade-out sonrası gizle
+    }
+
+    toggleBtn.addEventListener('click', openMenu);
+    closeBtn.addEventListener('click', closeMenu);
+    backdrop.addEventListener('click', closeMenu);
+    // Linke tıklanınca da menü kapansın
+    mobileLinks.forEach(link => link.addEventListener('click', closeMenu));
+</script>

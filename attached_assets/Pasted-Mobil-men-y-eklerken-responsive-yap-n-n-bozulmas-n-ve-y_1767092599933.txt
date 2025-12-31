@@ -1,0 +1,91 @@
+Mobil menüyü eklerken responsive yapının bozulmasını ve yatay kaydırma (horizontal scroll) sorununu önlemek için daha güvenli bir yöntem izleyeceğiz.
+
+Lütfen 'templates/base.html' dosyasında şu 3 adımı uygula:
+
+ADIM 1: Scroll Sorununu Çöz (CSS)
+- <head> içindeki <style> etiketine veya CSS dosyasına şu kuralı ekle:
+  `body { overflow-x: hidden; position: relative; }`
+  (Bu, sağdan gelecek menünün sayfayı sağa doğru genişletmesini ve düzeni bozmasını engeller).
+
+ADIM 2: Hamburger Butonunu Ekle
+- Mevcut Navbar kodunun içine, "Giriş Yap/Panel" butonlarının hemen yanına şu butonu ekle:
+  ```html
+  <button id="hamburger-btn" class="lg:hidden text-slate-200 text-2xl ml-4 focus:outline-none z-50 hover:text-violet-500 transition-colors">
+      <i class="fa-solid fa-bars"></i>
+  </button>
+ADIM 3: Off-Canvas Menü Panelini Ekle (Navbar'dan Bağımsız)
+
+Bu kodu Navbar'ın içine değil, sayfanın en altına, </body> etiketinin hemen öncesine yapıştır:
+
+HTML
+
+<div id="mobile-menu-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] hidden transition-opacity duration-300"></div>
+
+<div id="mobile-menu-panel" class="fixed top-0 right-0 h-full w-72 bg-slate-900 border-l border-violet-500/30 shadow-[0_0_50px_rgba(124,58,237,0.2)] z-[100] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    
+    <div class="flex items-center justify-between p-6 border-b border-slate-800">
+        <span class="text-xl font-bold text-white font-['Alegreya_SC']">Menü</span>
+        <button id="close-menu-btn" class="text-slate-400 hover:text-white text-2xl transition-colors">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <div class="flex flex-col p-4 space-y-2 overflow-y-auto">
+        <a href="/" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-house w-6 text-center"></i> Anasayfa
+        </a>
+        <a href="/#hakkimda" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-user w-6 text-center"></i> Hakkımda
+        </a>
+        <a href="/#yetenekler" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-bolt w-6 text-center"></i> Yetenekler
+        </a>
+        <a href="/#projeler" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-code w-6 text-center"></i> Çalışmalarım
+        </a>
+        <a href="/#egitim-kariyer" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-graduation-cap w-6 text-center"></i> Eğitim & Kariyer
+        </a>
+        <a href="/#iletisim" class="flex items-center gap-3 p-3 rounded-xl text-slate-300 hover:bg-slate-800 hover:text-violet-500 transition-all">
+            <i class="fa-solid fa-envelope w-6 text-center"></i> İletişim
+        </a>
+    </div>
+
+    <div class="mt-auto p-6 border-t border-slate-800">
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('admin_dashboard') }}" class="block w-full text-center bg-violet-600 text-white py-3 rounded-xl mb-3 hover:bg-violet-700 transition-colors">
+            Yönetim Paneli
+        </a>
+        <a href="{{ url_for('logout') }}" class="block w-full text-center border border-slate-700 text-slate-300 py-3 rounded-xl hover:text-red-400 hover:border-red-400 transition-colors">
+            Çıkış Yap
+        </a>
+        {% else %}
+        <a href="{{ url_for('login') }}" class="block w-full text-center border border-violet-500 text-violet-500 py-3 rounded-xl hover:bg-violet-500 hover:text-white transition-colors">
+            Giriş Yap
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Basit ve Hatasız JS
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const closeMenuBtn = document.getElementById('close-menu-btn');
+    const menuPanel = document.getElementById('mobile-menu-panel');
+    const menuOverlay = document.getElementById('mobile-menu-overlay');
+
+    function toggleMenu() {
+        const isClosed = menuPanel.classList.contains('translate-x-full');
+        if (isClosed) {
+            menuPanel.classList.remove('translate-x-full'); // Aç
+            menuOverlay.classList.remove('hidden'); // Perdeyi aç
+        } else {
+            menuPanel.classList.add('translate-x-full'); // Kapat
+            menuOverlay.classList.add('hidden'); // Perdeyi kapat
+        }
+    }
+
+    if(hamburgerBtn) hamburgerBtn.addEventListener('click', toggleMenu);
+    if(closeMenuBtn) closeMenuBtn.addEventListener('click', toggleMenu);
+    if(menuOverlay) menuOverlay.addEventListener('click', toggleMenu);
+</script>

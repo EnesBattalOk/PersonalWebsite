@@ -1,0 +1,76 @@
+{% extends "admin_base.html" %}
+{% block title %}Yetenekler Yönetimi{% endblock %}
+{% block content %}
+<div class="pb-20">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-bold text-white">Yetenekler Yönetimi</h1>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Add Skill Form -->
+        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 h-fit">
+            <h2 class="text-xl font-bold text-violet-400 mb-6">Yeni Yetenek Ekle</h2>
+            <form action="{{ url_for('admin_skills') }}" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Yetenek Adı</label>
+                    <input type="text" name="ad" required placeholder="Örn: Python" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Yüzde (1-100)</label>
+                    <input type="number" name="yuzde" min="1" max="100" required placeholder="85" class="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:border-violet-500 outline-none transition-all">
+                </div>
+                <button type="submit" class="w-full py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-[1.02]">
+                    <i class="fas fa-plus mr-2"></i> Yetenek Ekle
+                </button>
+            </form>
+        </div>
+
+        <!-- Skills Table -->
+        <div class="lg:col-span-2 overflow-hidden bg-slate-800/50 rounded-2xl border border-slate-700 shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 border-b border-slate-700">
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Yetenek Adı</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300">Yüzde</th>
+                            <th class="px-6 py-4 text-sm font-semibold text-slate-300 text-right">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-700/50">
+                        {% for yetenek in yetenekler %}
+                        <tr class="hover:bg-slate-700/30 transition-colors">
+                            <td class="px-6 py-4">
+                                <span class="text-white font-medium">{{ yetenek.ad }}</span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-1 h-2 bg-slate-900 rounded-full overflow-hidden">
+                                        <div class="h-full bg-violet-500 shadow-[0_0_10px_rgba(124,58,237,0.5)]" style="width: {{ yetenek.yuzde }}%"></div>
+                                    </div>
+                                    <span class="text-violet-400 font-bold text-sm w-8">%{{ yetenek.yuzde }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ url_for('edit_skill', id=yetenek.id) }}" class="p-2 text-slate-400 hover:text-violet-400 transition-colors" title="Düzenle">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{{ url_for('delete_skill', id=yetenek.id) }}" class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Sil" onclick="return confirm('Bu yeteneği silmek istediğinize emin misiniz?')">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if not yetenekler %}
+                        <tr>
+                            <td colspan="3" class="px-6 py-8 text-center text-slate-500 italic">Henüz yetenek eklenmemiş.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

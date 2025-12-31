@@ -1,0 +1,36 @@
+Admin paneli için 'Kitaplık' (/admin/books) modülünü geliştiriyoruz.
+
+Tasarım Hedefi: "Mesaj Kutusu" sayfasındaki tablo düzeninin aynısını kullan. Dark mode, neon detaylar ve temiz bir liste görünümü olsun.
+
+Lütfen aşağıdaki adımları uygula:
+
+ADIM 1: Backend Yönlendirmeleri (main.py)
+- `/admin/books` (GET): Tüm kitapları 'okunma_tarihi'ne göre tersten sıralayarak (en yeni en üstte) getir ve 'admin_books.html' şablonuna gönder.
+- `/admin/books/add` (POST): Formdan gelen verilerle (kitap_adi, yazar, sayfa_sayisi, okunma_tarihi) yeni kitap oluştur ve veritabanına kaydet.
+- `/admin/books/delete/<int:id>`: İlgili kitabı sil.
+
+ADIM 2: Frontend Tasarımı (templates/admin_books.html)
+- 'admin_base.html'den türet.
+- Sayfa Başlığı: "Okunan Kitaplar".
+- Sağ Üst Köşe: "Yeni Kitap Ekle" butonu (Mor renkli). Bu butona basınca bir MODAL açılmalı.
+
+- TABLO YAPISI (Mesajlar tablosuna benzer):
+  - Sütunlar: # | Kitap Adı | Yazar | Sayfa | Okunma Tarihi | İşlem
+  - Stil: `w-full text-left text-slate-300`, Başlıklar `text-slate-400 uppercase text-xs`, Satırlar `border-b border-slate-800 hover:bg-slate-800/50`.
+  - Her satırın sonunda kırmızı bir "Sil" butonu (ikonlu) olsun.
+
+ADIM 3: "Yeni Kitap Ekle" Modalı (Aynı dosya içinde)
+- Sayfanın altına gizli bir Modal (`fixed inset-0 ... hidden`) ekle.
+- Modal İçeriği:
+  - Başlık: "Kitap Ekle"
+  - Inputlar: Kitap Adı (text), Yazar (text), Sayfa Sayısı (number), Tarih (date).
+  - Butonlar: "Vazgeç" (Modalı kapatır), "Kaydet" (Formu submit eder).
+- JavaScript: "Yeni Kitap Ekle" butonuna basınca modalı açan (`classList.remove('hidden')`) ve Vazgeç'e basınca kapatan basit scripti ekle.
+
+ADIM 4: İstatistik Kartları (Opsiyonel ama şık durur)
+- Tablonun hemen üstüne yan yana 2 ufak kart ekle:
+  1. Toplam Okunan Kitap (Sayı)
+  2. Toplam Okunan Sayfa (Tüm kitapların sayfa sayısı toplamı).
+  - Bu verileri backend'de hesaplayıp template'e gönder (`toplam_kitap`, `toplam_sayfa`).
+
+Not: Tasarım dilimiz olan 'slate-900', 'slate-800' ve 'violet-500' renk paletine sadık kal.

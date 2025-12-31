@@ -1,0 +1,34 @@
+{% extends "admin_base.html" %}
+{% block title %}Mesaj Detayı{% endblock %}
+{% block content %}
+<div class="pb-20 max-w-4xl mx-auto">
+    <div class="mb-8 flex items-center justify-between">
+        <a href="{{ url_for('admin_inbox') }}" class="text-slate-400 hover:text-violet-400 transition-colors flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i> Geri Dön
+        </a>
+        <a href="{{ url_for('delete_message', id=mesaj.id) }}" class="text-red-500 hover:text-red-400 text-sm font-medium">
+            <i class="fas fa-trash mr-1"></i> Mesajı Sil
+        </a>
+    </div>
+
+    <div class="bg-slate-800/50 rounded-2xl border border-slate-700 p-8 shadow-xl">
+        <div class="flex items-start justify-between mb-8 pb-6 border-b border-slate-700">
+            <div>
+                <h1 class="text-2xl font-bold text-white mb-2">{{ mesaj.konu or '(Konu Yok)' }}</h1>
+                <div class="flex flex-col gap-1">
+                    <div class="text-violet-400 font-medium">{{ mesaj.gonderen_ad }}</div>
+                    <div class="text-slate-500 text-sm">{{ mesaj.gonderen_email }}</div>
+                </div>
+            </div>
+            <div class="text-slate-500 text-sm text-right">
+                {{ mesaj.tarih.strftime('%d.%m.%Y') }}<br>
+                {{ mesaj.tarih.strftime('%H:%M') }}
+            </div>
+        </div>
+
+        <div class="text-slate-300 leading-relaxed whitespace-pre-wrap">
+            {{ mesaj.mesaj_icerigi }}
+        </div>
+    </div>
+</div>
+{% endblock %}
