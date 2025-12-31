@@ -2,7 +2,7 @@
 {% block title %}Gelen Kutusu{% endblock %}
 {% block content %}
 <div class="pb-20">
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
         <h1 class="text-3xl font-bold text-white">Gelen Kutusu</h1>
         <div class="text-slate-400 text-sm">
             Toplam {{ mesajlar|length }} mesaj
@@ -10,7 +10,7 @@
     </div>
 
     <div class="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden">
-        <div class="overflow-x-auto">
+        <div class="table-responsive">
             <table class="w-full text-left">
                 <thead class="bg-slate-900/50 text-slate-400 text-sm uppercase">
                     <tr>

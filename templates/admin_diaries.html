@@ -4,18 +4,18 @@
 
 {% block content %}
 <div class="pb-20">
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
         <h1 class="text-3xl font-bold text-white">Günlük Kayıtlar</h1>
-        <div class="flex items-center gap-4">
-            <div class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700">
-                <button onclick="switchTab('gunluk')" id="tab-btn-gunluk" class="px-6 py-2 rounded-lg text-sm font-bold transition-all bg-violet-600 text-white shadow-lg shadow-violet-500/20">
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div class="flex bg-slate-800/50 p-1 rounded-xl border border-slate-700 w-full sm:w-auto">
+                <button onclick="switchTab('gunluk')" id="tab-btn-gunluk" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all bg-violet-600 text-white shadow-lg shadow-violet-500/20">
                     Günlük Notlar
                 </button>
-                <button onclick="switchTab('yillik')" id="tab-btn-yillik" class="px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-white">
+                <button onclick="switchTab('yillik')" id="tab-btn-yillik" class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-bold transition-all text-slate-400 hover:text-white">
                     Yıllık Kayıtlar
                 </button>
             </div>
-            <button onclick="openModal()" class="px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-105">
+            <button onclick="openModal()" class="w-full sm:w-auto px-6 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-105">
                 <i class="fas fa-plus mr-2"></i> Yeni Kayıt
             </button>
         </div>

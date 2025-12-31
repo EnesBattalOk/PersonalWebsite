@@ -27,6 +27,12 @@
             width: 0 !important;
             height: 0 !important;
         }
+        .table-responsive {
+            display: block;
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 flex min-h-screen">
@@ -134,7 +140,7 @@
     </aside>
 
     <!-- Content Area -->
-    <main class="flex-grow lg:ml-64 p-4 md:p-8 pt-20 lg:pt-8">
+    <main class="flex-grow lg:ml-64 p-3 sm:p-8 pt-20 lg:pt-8">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 <div class="mb-6 space-y-2">

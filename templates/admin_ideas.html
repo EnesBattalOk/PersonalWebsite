@@ -3,23 +3,23 @@
 {% block content %}
 <div class="pb-20">
     <!-- Page Header -->
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
         <h1 class="text-3xl font-bold text-white">Fikir Laboratuvarı</h1>
-        <button onclick="openAddIdeaModal()" class="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all shadow-lg shadow-violet-500/20">
+        <button onclick="openAddIdeaModal()" class="w-full sm:w-auto px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-all shadow-lg shadow-violet-500/20">
             <i class="fas fa-plus mr-2"></i> Yeni Fikir Ekle
         </button>
     </div>
 
     <!-- TAB MENU (Centered Button Group) -->
-    <div class="flex justify-center gap-4 mb-8">
-        <button onclick="switchTab('fikir')" id="tab-fikir-btn" class="tab-button active px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 bg-violet-600 text-white shadow-lg shadow-violet-500/20">
-            <i class="fas fa-lightbulb"></i> FİKİR HAVUZU
+    <div class="flex flex-wrap justify-center gap-2 sm:gap-4 mb-8">
+        <button onclick="switchTab('fikir')" id="tab-fikir-btn" class="tab-button active flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 bg-violet-600 text-white shadow-lg shadow-violet-500/20">
+            <i class="fas fa-lightbulb"></i> <span class="text-xs sm:text-base">FİKİR HAVUZU</span>
         </button>
-        <button onclick="switchTab('aktif')" id="tab-aktif-btn" class="tab-button px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
-            <i class="fas fa-hammer"></i> AKTİF ŞANTİYE
+        <button onclick="switchTab('aktif')" id="tab-aktif-btn" class="tab-button flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
+            <i class="fas fa-hammer"></i> <span class="text-xs sm:text-base">AKTİF ŞANTİYE</span>
         </button>
-        <button onclick="switchTab('honor')" id="tab-honor-btn" class="tab-button px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
-            <i class="fas fa-trophy"></i> ONUR LİSTESİ
+        <button onclick="switchTab('honor')" id="tab-honor-btn" class="tab-button flex-1 sm:flex-none px-4 sm:px-6 py-3 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700">
+            <i class="fas fa-trophy"></i> <span class="text-xs sm:text-base">ONUR LİSTESİ</span>
         </button>
     </div>
 
@@ -28,11 +28,11 @@
         <div class="flex items-center gap-3 mb-6">
             <i class="fas fa-lightbulb text-2xl text-yellow-400"></i>
             <h2 class="text-2xl font-bold text-white">Fikir Havuzu</h2>
-            <span class="ml-auto text-sm text-slate-400">{{ fikirler|length if fikirler else 0 }} fikir</span>
+            <span class="ml-auto text-sm text-slate-400 hidden sm:inline">{{ fikirler|length if fikirler else 0 }} fikir</span>
         </div>
         
         {% if fikirler %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
             {% for fikir in fikirler %}
             <div class="bg-slate-800 rounded-xl border-2 border-dashed border-slate-600 p-6 flex flex-col hover:border-violet-500/50 transition-all">
                 <!-- Title -->
@@ -125,7 +125,7 @@
                 </div>
 
                 <div id="kanban-{{ proje.id }}" class="hidden mt-6 pt-6 border-t border-slate-700">
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
                             <h5 class="font-semibold text-yellow-400 mb-3 text-sm">YAPILACAKLAR</h5>
                             <div class="space-y-2 kanban-column min-h-[100px]" id="col-yapilacak-{{ proje.id }}" data-project-id="{{ proje.id }}" data-status="YAPILACAK">
