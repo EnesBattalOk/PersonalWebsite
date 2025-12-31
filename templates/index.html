@@ -72,35 +72,64 @@
     </div>
 </section>
 
-<section id="egitim-kariyer" class="py-20">
+<section id="egitim" class="py-20">
     <div class="container mx-auto px-6 max-w-4xl">
-        <h2 class="text-3xl font-bold text-center mb-12 text-white">Eğitim ve Kariyer Hayatım</h2>
-        
+        <h2 class="text-3xl font-bold text-center mb-12 text-white">Eğitim Hayatım</h2>
         <div class="space-y-8">
-            {% for item in egitimler + deneyimler | sort(attribute='order_index') %}
+            {% for item in egitimler | sort(attribute='order_index') %}
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-violet-500 transition-all flex flex-row gap-6 items-start">
-                <div class="w-20 h-20 flex-shrink-0 bg-slate-900 rounded-xl border-2 {% if item.tip == 'Egitim' %}border-violet-500/50{% else %}border-emerald-500/50{% endif %} flex items-center justify-center overflow-hidden">
+                <div class="w-20 h-20 flex-shrink-0 bg-slate-900 rounded-xl border-2 border-violet-500/50 flex items-center justify-center overflow-hidden">
                     {% if item.logo_url %}
                     <img src="{{ item.logo_url }}" class="w-full h-full object-cover">
                     {% else %}
-                    <i class="fa-solid {% if item.tip == 'Egitim' %}fa-graduation-cap text-violet-400{% else %}fa-briefcase text-emerald-400{% endif %} text-2xl"></i>
+                    <i class="fa-solid fa-graduation-cap text-violet-400 text-2xl"></i>
                     {% endif %}
                 </div>
                 <div class="flex-1 min-w-0 text-left">
                     <h3 class="text-xl font-bold text-white">{{ item.baslik }}</h3>
-                    
                     <div class="flex flex-wrap gap-2 my-3">
-                        {% set badge_info = item.degree if item.tip == 'Egitim' else item.position %}
-                        {% if badge_info %}
-                        <span class="px-3 py-1 rounded-lg text-xs font-bold border {% if item.tip == 'Egitim' %}border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)]{% else %}border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10px_rgba(16,185,129,0.2)]{% endif %}">
-                            {{ badge_info | upper }}
+                        {% if item.degree %}
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold border border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)]">
+                            {{ item.degree | upper }}
                         </span>
                         {% endif %}
-                        <span class="px-3 py-1 rounded-lg text-xs font-bold border {% if item.tip == 'Egitim' %}border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)]{% else %}border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10px_rgba(16,185,129,0.2)]{% endif %} whitespace-nowrap">
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold border border-violet-500/50 text-violet-400 bg-violet-500/5 shadow-[0_0_10px_rgba(124,58,237,0.2)] whitespace-nowrap">
                             {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
                         </span>
                     </div>
+                    <p class="text-slate-300 text-sm mt-2 break-all">{{ item.notlar }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
 
+<section id="kariyer" class="py-20 bg-slate-800/30">
+    <div class="container mx-auto px-6 max-w-4xl">
+        <h2 class="text-3xl font-bold text-center mb-12 text-white">Kariyer Hayatım</h2>
+        <div class="space-y-8">
+            {% for item in deneyimler | sort(attribute='order_index') %}
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 hover:border-violet-500 transition-all flex flex-row gap-6 items-start">
+                <div class="w-20 h-20 flex-shrink-0 bg-slate-900 rounded-xl border-2 border-emerald-500/50 flex items-center justify-center overflow-hidden">
+                    {% if item.logo_url %}
+                    <img src="{{ item.logo_url }}" class="w-full h-full object-cover">
+                    {% else %}
+                    <i class="fa-solid fa-briefcase text-emerald-400 text-2xl"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0 text-left">
+                    <h3 class="text-xl font-bold text-white">{{ item.baslik }}</h3>
+                    <div class="flex flex-wrap gap-2 my-3">
+                        {% if item.position %}
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold border border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
+                            {{ item.position | upper }}
+                        </span>
+                        {% endif %}
+                        <span class="px-3 py-1 rounded-lg text-xs font-bold border border-emerald-500/50 text-emerald-400 bg-emerald-500/5 shadow-[0_0_10px_rgba(16,185,129,0.2)] whitespace-nowrap">
+                            {{ item.start_date }} - {{ 'Devam Ediyor' if item.is_active else item.end_date }}
+                        </span>
+                    </div>
                     <p class="text-slate-300 text-sm mt-2 break-all">{{ item.notlar }}</p>
                 </div>
             </div>
@@ -115,13 +144,7 @@
             <div class="lg:w-1/3">
                 <h2 class="text-3xl font-bold text-white mb-8">İletişime Geç</h2>
                 <div class="space-y-4">
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 flex items-start gap-4">
-                        <i class="fas fa-envelope text-violet-500 text-xl mt-1"></i>
-                        <div>
-                            <p class="text-xs text-slate-400 font-semibold uppercase">E-Posta</p>
-                            <p class="text-slate-300 text-sm break-words">{{ admin.iletisim_email if admin else 'E-posta yok' }}</p>
-                        </div>
-                    </div>
+                    <!-- E-posta kaldırıldı -->
                 </div>
             </div>
 
