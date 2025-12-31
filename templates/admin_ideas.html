@@ -840,68 +840,123 @@
         .catch(error => console.error('Hata:', error));
     };
 
-    // Proje Haritası Modal
+    // Proje Haritası Modal (Dikey Roadmap Görünüm)
     function openProjectMap(projectId, projectTitle) {
-        const phases = {};
+        const allTasks = [];
         const phaseElements = document.querySelectorAll(`[data-project-id="${projectId}"]`);
         
+        // Tüm görevleri topla
         phaseElements.forEach(column => {
             const status = column.dataset.status;
-            const statusMap = { 'YAPILACAK': 'Yapılacaklar', 'SURUYOR': 'Sürüyor', 'BITTI': 'Tamamlandı' };
-            phases[statusMap[status]] = [];
-            
             column.querySelectorAll('[data-task-id]').forEach(task => {
                 const taskTitle = task.querySelector('p').textContent;
-                const taskPhase = task.querySelector('.text-xs')?.textContent || 'Belirsiz';
-                phases[statusMap[status]].push({ title: taskTitle, phase: taskPhase, status: status });
+                const taskPhase = task.querySelector('.text-xs')?.textContent || 'Bilinmeyen Faz';
+                allTasks.push({ title: taskTitle, phase: taskPhase, status: status });
             });
+        });
+        
+        // Fazları grupla
+        const phaseMap = {};
+        allTasks.forEach(task => {
+            if (!phaseMap[task.phase]) {
+                phaseMap[task.phase] = [];
+            }
+            phaseMap[task.phase].push(task);
         });
         
         let modal = document.getElementById('projectMapModal');
         if (!modal) {
             modal = document.createElement('div');
             modal.id = 'projectMapModal';
-            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; overflow-y:auto;';
+            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:1000; overflow-y:auto; padding:40px 20px;';
             document.body.appendChild(modal);
         }
         
-        let content = `
-            <div style="background:#1e293b; width:90%; max-width:900px; margin:40px auto; padding:30px; border-radius:15px; border:2px solid #7c3aed;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                    <h2 style="color:white; font-size:24px; font-weight:bold;">🗺️ Proje Haritası: ${projectTitle}</h2>
-                    <button onclick="closeProjectMap()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold;">✕</button>
-                </div>
-                <hr style="border:none; border-top:1px solid #475569; margin-bottom:20px;">
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:20px;">
+        // CSS stil ekle
+        const style = `
+            <style>
+            .roadmap-container { position:relative; padding:20px 0 20px 40px; }
+            .roadmap-container::before {
+                content:''; position:absolute; top:0; bottom:0; left:14px;
+                width:4px; background:#334155; border-radius:2px;
+            }
+            .roadmap-phase { position:relative; margin-bottom:40px; }
+            .roadmap-phase::before {
+                content:''; position:absolute; left:-33px; top:8px;
+                width:18px; height:18px; border-radius:50%;
+                background:#1a1e29; border:4px solid #64748b; z-index:1;
+            }
+            .roadmap-phase.completed::before { border-color:#10b981; background:#10b981; box-shadow:0 0 10px rgba(16,185,129,0.5); }
+            .roadmap-phase.active::before { border-color:#8b5cf6; background:#1a1e29; box-shadow:0 0 15px rgba(139,92,246,0.8); }
+            .phase-card { background:#1e293b; padding:20px; border-radius:10px; border:2px solid #334155; }
+            .phase-card.active { border-color:#8b5cf6; background:#1e293b; }
+            .phase-card.completed { border-color:#10b981; }
+            .phase-title { margin:0 0 15px 0; font-size:18px; color:#e2e8f0; font-weight:bold; }
+            .phase-card.completed .phase-title { color:#10b981; }
+            .phase-card.active .phase-title { color:#8b5cf6; }
+            .phase-tasks ul { list-style:none; padding:0; margin:0; }
+            .phase-tasks li { color:#cbd5e1; margin-bottom:8px; padding:8px; background:#0f172a; border-radius:5px; border-left:3px solid #64748b; }
+            .phase-tasks li.completed { text-decoration:line-through; color:#64748b; border-left-color:#10b981; }
+            .phase-tasks li.active { border-left-color:#8b5cf6; color:#e2e8f0; }
+            </style>
         `;
         
-        const statusColors = { 'YAPILACAK': '#f59e0b', 'SURUYOR': '#3b82f6', 'BITTI': '#10b981' };
-        const statusIcons = { 'YAPILACAK': '📋', 'SURUYOR': '⚙️', 'BITTI': '✅' };
+        let content = `${style}
+            <div style="background:#0f172a; width:95%; max-width:800px; margin:0 auto; padding:30px; border-radius:15px; border:2px solid #8b5cf6;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <h2 style="color:white; font-size:26px; font-weight:bold; margin:0;">🛣️ ${projectTitle}</h2>
+                    <button onclick="closeProjectMap()" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:16px;">✕</button>
+                </div>
+                <p style="color:#94a3b8; margin-bottom:30px; font-size:14px;">Projenin adım adım ilerleme yolunu görüntüleyin</p>
+                <div class="roadmap-container">
+        `;
         
-        for (const [statusName, tasks] of Object.entries(phases)) {
-            const statusKey = Object.keys({ 'YAPILACAKLAR': 'YAPILACAK', 'Sürüyor': 'SURUYOR', 'Tamamlandı': 'BITTI' }).find(k => Object.values({ 'YAPILACAKLAR': 'YAPILACAK', 'Sürüyor': 'SURUYOR', 'Tamamlandı': 'BITTI' })[k] === statusName);
-            const color = Object.values(statusColors)[Object.keys(statusColors).indexOf(Object.keys(statusColors).find(k => Object.values({ 'YAPILACAK': '#f59e0b', 'SURUYOR': '#3b82f6', 'BITTI': '#10b981' })[k] === statusName) || 0)] || '#8b5cf6';
+        // Hazırlanmış tüm görevleri say
+        let completedCount = 0;
+        let activePhaseSet = false;
+        
+        Object.entries(phaseMap).forEach(([phaseName, tasks], index) => {
+            const phaseCompleted = tasks.every(t => t.status === 'BITTI');
+            const phaseActive = tasks.some(t => t.status === 'SURUYOR');
+            const isActive = phaseActive && !activePhaseSet;
+            
+            if (phaseCompleted) completedCount++;
+            if (isActive) activePhaseSet = true;
+            
+            const phaseClass = phaseCompleted ? 'completed' : isActive ? 'active' : '';
             
             content += `
-                <div style="background:#0f172a; border-left:5px solid ${color}; padding:15px; border-radius:10px;">
-                    <h3 style="color:${color}; font-weight:bold; margin-bottom:10px; font-size:16px;">
-                        ${statusName} (${tasks.length})
-                    </h3>
-                    <ul style="list-style:none; padding:0; margin:0;">
+                <div class="roadmap-phase ${phaseClass}">
+                    <div class="phase-card ${phaseClass}">
+                        <h3 class="phase-title">${phaseName}</h3>
+                        <div class="phase-tasks">
+                            <ul>
             `;
             
             tasks.forEach(task => {
+                const taskStatus = task.status === 'BITTI' ? 'completed' : task.status === 'SURUYOR' ? 'active' : '';
                 const icon = task.status === 'BITTI' ? '✅' : task.status === 'SURUYOR' ? '⚙️' : '📋';
-                content += `<li style="color:#e2e8f0; padding:8px 0; border-bottom:1px solid #334155; font-size:14px;">
-                    <span>${icon}</span> ${task.title}
-                    <p style="color:#94a3b8; font-size:12px; margin:4px 0 0 0;">📌 ${task.phase}</p>
-                </li>`;
+                content += `<li class="${taskStatus}"><span>${icon}</span> ${task.title}</li>`;
             });
             
-            content += `</ul></div>`;
-        }
+            content += `
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
         
-        content += `</div></div>`;
+        content += `
+                </div>
+                <div style="margin-top:30px; padding:15px; background:#1e293b; border-radius:8px; border-left:4px solid #8b5cf6;">
+                    <p style="color:#cbd5e1; margin:0; font-size:13px;">
+                        <strong>İlerleme:</strong> ${completedCount} / ${Object.entries(phaseMap).length} faz tamamlandı
+                    </p>
+                </div>
+            </div>
+        `;
+        
         modal.innerHTML = content;
         modal.style.display = 'block';
         

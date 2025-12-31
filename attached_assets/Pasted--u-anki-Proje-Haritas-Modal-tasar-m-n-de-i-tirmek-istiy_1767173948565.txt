@@ -1,0 +1,59 @@
+Şu anki "Proje Haritası" (Modal) tasarımını değiştirmek istiyorum. Mevcut "Yapılacaklar/Sürüyor/Bitti" şeklindeki yan yana (Kanban) görünümü yerine, yukarıdan aşağıya akan dikey bir "Yol Haritası" (Vertical Timeline) görünümü yapmanı istiyorum.
+
+İstediğim özellikler şunlar:
+1. Fazlar (Phase 1, Phase 2 vb.) alt alta sıralansın.
+2. Sol tarafta dikey bir çizgi olsun, her fazın başında bir nokta (durak) olsun.
+3. Tamamlanan fazlar yeşil, şu an aktif olan faz parlak renkli, henüz gelmemiş fazlar gri olsun.
+4. Görevler, ait oldukları fazın kutusu içinde listelensin.
+
+Bunun için aşağıdaki CSS ve HTML yapısını projeme entegre et ve eğer JavaScript ile bu verileri döngüye sokuyorsan, JS kodunu da bu yeni HTML yapısına uygun olacak şekilde güncelle:
+
+/* KULLANILACAK CSS */
+.roadmap-container {
+    position: relative;
+    padding: 20px 0;
+    margin-left: 20px;
+}
+.roadmap-container::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: 7px;
+    width: 4px; background: #2b3b55; border-radius: 2px;
+}
+.roadmap-phase {
+    position: relative; margin-bottom: 30px; padding-left: 30px;
+}
+.roadmap-phase::before {
+    content: ''; position: absolute; left: 0; top: 5px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #1a1e29; border: 4px solid #6c757d; z-index: 1;
+}
+.roadmap-phase.completed::before {
+    border-color: #28a745; background: #28a745;
+    box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+}
+.roadmap-phase.active::before {
+    border-color: #007bff; background: #1a1e29;
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.8);
+}
+.phase-card {
+    background: #1e2532; padding: 15px;
+    border-radius: 8px; border: 1px solid #2b3b55;
+}
+.phase-title { margin: 0 0 10px 0; font-size: 1.1rem; color: #e0e0e0; }
+.phase-tasks ul { list-style: none; padding: 0; margin: 0; }
+.phase-tasks li { color: #a0a0a0; margin-bottom: 5px; }
+
+/* İSTENEN HTML YAPISI ÖRNEĞİ */
+<div class="roadmap-container">
+    <div class="roadmap-phase completed"> <div class="phase-card">
+            <h3 class="phase-title">Faz Adı</h3>
+            <div class="phase-tasks">
+                <ul>
+                    <li>Görev 1</li>
+                    <li>Görev 2</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
