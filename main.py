@@ -545,6 +545,38 @@ def create_app():
             return jsonify({'success': True})
         return jsonify({'success': False}), 400
 
+    @app.route('/admin/books/update/<int:id>', methods=['POST'])
+    @login_required
+    def update_book(id):
+        kitap = Kitap.query.get_or_404(id)
+        data = request.get_json()
+        if data:
+            kitap.kitap_adi = data.get('kitap_adi', kitap.kitap_adi)
+            kitap.yazar = data.get('yazar', kitap.yazar)
+            kitap.sayfa_sayisi = int(data.get('sayfa_sayisi') or kitap.sayfa_sayisi)
+            if data.get('okunma_tarihi'):
+                try:
+                    kitap.okunma_tarihi = datetime.strptime(data.get('okunma_tarihi'), '%Y-%m-%d')
+                except: pass
+            db.session.commit()
+            return jsonify({'success': True})
+        return jsonify({'success': False}), 400
+
+    @app.route('/admin/planner/update_tarih/<int:id>', methods=['POST'])
+    @login_required
+    def update_planner_tarih(id):
+        data = request.get_json()
+        gorev = Gorev.query.get_or_404(id)
+        if data and 'yeni_tarih' in data:
+            try:
+                yeni_tarih = datetime.strptime(data['yeni_tarih'], '%Y-%m-%d')
+                gorev.son_tarih = yeni_tarih
+                db.session.commit()
+                return jsonify({'success': True})
+            except:
+                return jsonify({'success': False, 'error': 'Tarih formatı hatalı'}), 400
+        return jsonify({'success': False, 'error': 'Tarih gönderilmedi'}), 400
+
     @app.route('/admin/studio/update/<int:id>', methods=['POST'])
     @login_required
     def update_studio_project(id):
