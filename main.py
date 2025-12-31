@@ -106,8 +106,8 @@ def create_app():
         admin = Kullanici.query.first()
         projeler = Proje.query.order_by(Proje.id.desc()).all()
         yetenekler = Yetenek.query.all()
-        egitimler = YolHaritasi.query.filter_by(tip='Egitim').all()
-        deneyimler = YolHaritasi.query.filter_by(tip='Deneyim').all()
+        egitimler = YolHaritasi.query.filter_by(tip='Egitim').order_by(YolHaritasi.order_index.asc()).all()
+        deneyimler = YolHaritasi.query.filter_by(tip='Deneyim').order_by(YolHaritasi.order_index.asc()).all()
         return render_template('index.html', admin=admin, projeler=projeler, yetenekler=yetenekler, egitimler=egitimler, deneyimler=deneyimler)
 
     @app.route('/login', methods=['GET', 'POST'])
@@ -160,8 +160,11 @@ def create_app():
             admin.iletisim_telefon = request.form.get('iletisim_telefon')
             admin.iletisim_konum = request.form.get('iletisim_konum')
             admin.telefon_gorunur = 'telefon_gorunur' in request.form
+            admin.show_phone = 'show_phone' in request.form
             admin.sosyal_github = request.form.get('sosyal_github')
             admin.sosyal_linkedin = request.form.get('sosyal_linkedin')
+            admin.website_label = request.form.get('website_label')
+            admin.website_url = request.form.get('website_url')
 
             # Cropper.js base64 data
             cropped_data = request.form.get('cropped_data')
@@ -318,6 +321,11 @@ def create_app():
             baslik = request.form.get('baslik')
             tarih_araligi = request.form.get('tarih_araligi')
             notlar = request.form.get('notlar')
+            order_index = int(request.form.get('order_index') or 0)
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
+            is_active = 'is_active' in request.form
+            position = request.form.get('position')
             
             logo_url = None
             if 'logo' in request.files:
@@ -327,13 +335,17 @@ def create_app():
                     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                     logo_url = url_for('static', filename='uploads/' + filename)
 
-            yeni_item = YolHaritasi(tip=tip, baslik=baslik, tarih_araligi=tarih_araligi, notlar=notlar, logo_url=logo_url)
+            yeni_item = YolHaritasi(
+                tip=tip, baslik=baslik, tarih_araligi=tarih_araligi, notlar=notlar, 
+                logo_url=logo_url, order_index=order_index, start_date=start_date,
+                end_date=end_date, is_active=is_active, position=position
+            )
             db.session.add(yeni_item)
             db.session.commit()
             flash('Kayıt başarıyla eklendi.', 'success')
             return redirect(url_for('admin_resume'))
             
-        items = YolHaritasi.query.all()
+        items = YolHaritasi.query.order_by(YolHaritasi.order_index.asc()).all()
         return render_template('admin_resume.html', items=items)
 
     @app.route('/admin/resume/edit/<int:id>', methods=['GET', 'POST'])
@@ -345,6 +357,11 @@ def create_app():
             item.baslik = request.form.get('baslik')
             item.tarih_araligi = request.form.get('tarih_araligi')
             item.notlar = request.form.get('notlar')
+            item.order_index = int(request.form.get('order_index') or 0)
+            item.start_date = request.form.get('start_date')
+            item.end_date = request.form.get('end_date')
+            item.is_active = 'is_active' in request.form
+            item.position = request.form.get('position')
 
             if 'logo' in request.files:
                 file = request.files['logo']

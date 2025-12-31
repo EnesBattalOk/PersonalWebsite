@@ -1,0 +1,34 @@
+Sitemin portfolyo ve iletişim kısımlarında kapsamlı görsel ve işlevsel güncellemeler yapmak istiyorum. Lütfen aşağıdaki 7 maddeyi tek tek uygula:
+
+1. **Proje Resimleri (CSS):**
+   - Proje kartlarındaki resimlerin (`card-img-top` veya ilgili sınıf) kutuya tam oturmasını sağla.
+   - Resimler bozulmasın veya sıkışmasın; `object-fit: cover;` ve sabit bir yükseklik (örneğin 200px) değeri vererek düzgün görünmesini sağla.
+
+2. **Eğitim ve Deneyim Sıralaması (DB & Admin):**
+   - `Education` ve `Experience` tablolarına `order_index` (Integer) adında bir sütun ekle.
+   - Admin panelinde bu kayıtları eklerken veya düzenlerken, sıralama numarasını değiştirebileceğim bir input alanı koy.
+   - Ön yüzde (Frontend) bu verileri çekerken bu numaraya göre sırala (Örn: 1, 2, 3...).
+
+3. **Eğitim ve Deneyim Tarih Mantığı (DB & Admin):**
+   - Mevcut "Tarih Aralığı" (string) yapısını değiştir. Yerine `start_date` (Date/String), `end_date` (Date/String) ve `is_active` (Boolean - Devam Ediyor mu?) alanlarını ekle.
+   - **Frontend'de:** Eğer `is_active` seçiliyse bitiş tarihi yerine "Devam Ediyor" (veya "Present") yazsın. Değilse "2020 - 2024" formatında göstersin.
+
+4. **Deneyim Pozisyon Bilgisi (DB):**
+   - `Experience` tablosuna `position` (String) adında yeni bir sütun ekle.
+   - Ön yüzde: Kurum adının altında, daha küçük veya farklı bir fontla pozisyonu (Örn: "Senior Developer") göster.
+
+5. **İletişim Ayarları - Telefon Gizleme (DB & Admin):**
+   - Ayarlar (Settings) tablosuna `show_phone` (Boolean) sütunu ekle.
+   - Admin panelinden bu ayarı açıp kapatabileyim.
+   - **Frontend'de:** Eğer bu ayar kapalıysa, İletişim bölümündeki "Telefon" kutusu tamamen gizlensin (DOM'dan kalksın).
+
+6. **Web Site Alanı Ayarı:**
+   - Ayarlar tablosuna `website_label` ve `website_url` alanlarını ekle (veya mevcut yapıyı buna göre düzenle).
+   - Admin panelinden buraya ne yazarsam (Örn: "tunahancengiz.com" veya "Portfolyom") sitede o yazsın ve link oraya gitsin.
+
+7. **İletişim Formu Hizalaması (CSS - Flexbox):**
+   - İletişim sayfasındaki yapıyı düzenle.
+   - Sol taraftaki "İletişim Bilgileri" kutuları ile sağ taraftaki "İletişim Formu"nun alt hizaları eşit olsun.
+   - Bunu sağlamak için ana kapsayıcıya `display: flex; align-items: stretch;` özelliğini ver ve formun bulunduğu kutunun (textarea dahil) yüksekliğini sol tarafın toplam yüksekliğine eşitleyecek şekilde ayarla.
+
+Lütfen veritabanı modellerini güncelle, gerekli route'ları ve HTML şablonlarını bu isteklere göre yeniden düzenle.

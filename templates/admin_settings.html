@@ -145,12 +145,31 @@
                     <label class="block text-sm font-medium text-slate-400 mb-2">Konum</label>
                     <input type="text" name="iletisim_konum" value="{{ admin.iletisim_konum or '' }}" placeholder="Örn: Antalya, Türkiye" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
                 </div>
-                <div class="flex items-center pt-8">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" name="telefon_gorunur" class="sr-only peer" {% if admin.telefon_gorunur %}checked{% endif %}>
-                        <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-violet-600"></div>
-                        <span class="ml-3 text-sm font-medium text-slate-300">Telefon Sitede Görünsün</span>
-                    </label>
+                <div class="flex flex-col gap-6">
+                    <div class="flex items-center">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="telefon_gorunur" class="sr-only peer" {% if admin.telefon_gorunur %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-violet-600"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-300">Telefon Sitede Görünsün</span>
+                        </label>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" name="show_phone" class="sr-only peer" {% if admin.show_phone %}checked{% endif %}>
+                            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all peer-checked:bg-violet-600"></div>
+                            <span class="ml-3 text-sm font-medium text-slate-300">İletişim Bölümünde Telefonu Göster</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Web Sitesi Etiketi</label>
+                        <input type="text" name="website_label" value="{{ admin.website_label or '' }}" placeholder="Örn: tunahancengiz.com" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-2">Web Sitesi URL</label>
+                        <input type="url" name="website_url" value="{{ admin.website_url or '' }}" placeholder="https://..." class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-violet-500 transition-all">
+                    </div>
                 </div>
             </div>
         </div>

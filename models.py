@@ -15,6 +15,9 @@ class Kullanici(UserMixin, db.Model):
     telefon_gorunur = db.Column(db.Boolean, default=False)
     sosyal_linkedin = db.Column(db.String(255))
     sosyal_github = db.Column(db.String(255))
+    show_phone = db.Column(db.Boolean, default=True)
+    website_label = db.Column(db.String(100))
+    website_url = db.Column(db.String(255))
 
 class Gunluk(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +48,11 @@ class YolHaritasi(db.Model):
     tip = db.Column(db.String(50)) # 'Egitim' veya 'Deneyim'
     tarih_araligi = db.Column(db.String(100))
     logo_url = db.Column(db.String(255))
+    order_index = db.Column(db.Integer, default=0)
+    start_date = db.Column(db.String(50))
+    end_date = db.Column(db.String(50))
+    is_active = db.Column(db.Boolean, default=False)
+    position = db.Column(db.String(100))
     
     kategori = db.relationship('CalismaKategori', backref=db.backref('yol_haritalari', lazy=True))
 
