@@ -1,7 +1,7 @@
-modules = ["python-3.11", "postgresql-16"]
+modules = ["python-3.11"]
 [nix]
 channel = "stable-25_05"
-packages = ["cargo", "freetype", "lcms2", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pkg-config", "rustc", "tcl", "tk", "unzip", "zlib"]
+packages = ["cargo", "libiconv", "libxcrypt", "openssl", "pkg-config", "rustc", "unzip"]
 
 [agent]
 expertMode = true

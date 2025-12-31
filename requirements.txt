@@ -25,3 +25,8 @@ Pillow
 requests
 sqlalchemy
 werkzeug
+cryptography
+flask
+flask-login
+flask-sqlalchemy
+werkzeug
