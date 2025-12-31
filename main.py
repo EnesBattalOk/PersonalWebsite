@@ -399,6 +399,17 @@ def create_app():
         flash('Yeni kayıt başarıyla eklendi.', 'success')
         return redirect(url_for('admin_diaries'))
 
+    @app.route('/admin/diaries/update/<int:id>', methods=['POST'])
+    @login_required
+    def update_diary(id):
+        gunluk = Gunluk.query.get_or_404(id)
+        gunluk.baslik = request.json.get('baslik', gunluk.baslik)
+        gunluk.icerik = request.json.get('icerik', gunluk.icerik)
+        if gunluk.tur == 'GUNLUK':
+            gunluk.duygu = request.json.get('duygu', gunluk.duygu)
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Kayıt başarıyla güncellendi'})
+
     @app.route('/admin/diaries/delete/<int:id>')
     @login_required
     def delete_diary(id):

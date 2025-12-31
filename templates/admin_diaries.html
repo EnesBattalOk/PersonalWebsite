@@ -35,9 +35,14 @@
             <div class="bg-slate-800/40 border-2 {{ border_color }} rounded-2xl p-6 hover:transform hover:scale-[1.02] transition-all shadow-xl group relative overflow-hidden flex flex-col h-full">
                 <div class="flex justify-between items-start mb-4">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">{{ gunluk.tarih.strftime('%d %B %Y') }}</span>
-                    <a href="{{ url_for('delete_diary', id=gunluk.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100">
-                        <i class="fas fa-trash-alt"></i>
-                    </a>
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="openEditDailyModal({{ gunluk.id }}, '{{ gunluk.baslik }}', '{{ gunluk.icerik|replace("'", "\\'") }}', '{{ gunluk.duygu or '' }}')" class="text-slate-600 hover:text-blue-400 transition-colors p-1">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <a href="{{ url_for('delete_diary', id=gunluk.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-1">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
                 </div>
                 <h3 class="text-lg font-bold text-white mb-2">{{ gunluk.baslik }}</h3>
                 <div class="text-slate-400 text-sm flex-grow mb-4 prose prose-invert prose-sm max-w-none line-clamp-6">
@@ -59,9 +64,6 @@
                         </span>
                         {% endif %}
                     </div>
-                    <button onclick="viewDiary({{ gunluk.id }})" class="text-violet-400 hover:text-violet-300 text-xs font-bold uppercase tracking-widest transition-colors">
-                        Tamamını Oku
-                    </button>
                 </div>
             </div>
             {% endfor %}
@@ -87,7 +89,10 @@
             </div>
             <div class="flex items-center gap-4">
                 <span class="text-xs font-medium text-slate-500">{{ yillik.tarih.strftime('%d.%m.%Y') }}</span>
-                <a href="{{ url_for('delete_diary', id=yillik.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-2">
+                <button onclick="openEditYearlyModal({{ yillik.id }}, '{{ yillik.baslik }}', '{{ yillik.icerik|replace("'", "\\'") }}')" class="text-slate-600 hover:text-blue-400 transition-colors p-2 rounded hover:bg-slate-700/30">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <a href="{{ url_for('delete_diary', id=yillik.id) }}" onclick="return confirm('Silmek istediğinize emin misiniz?')" class="text-slate-600 hover:text-red-500 transition-colors p-2 rounded hover:bg-slate-700/30">
                     <i class="fas fa-trash-alt"></i>
                 </a>
             </div>
@@ -102,7 +107,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Modal Ekle -->
 <div id="add-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
     <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
         <div class="p-6 border-b border-slate-800 flex justify-between items-center">
@@ -173,9 +178,101 @@
     </div>
 </div>
 
+<!-- Edit Daily Modal -->
+<div id="edit-daily-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white">Günlük Notu Düzenle</h3>
+            <button onclick="closeEditDailyModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="editDailyForm" class="p-6 space-y-6 overflow-y-auto flex-grow" onsubmit="submitEditDailyForm(event)">
+            <input type="hidden" id="editDailyId">
+
+            <!-- Başlık Alanı -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-300 uppercase tracking-widest">Başlık</label>
+                <input type="text" id="editDailyBaslik" required class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+
+            <!-- Duygu Durumu Seçici -->
+            <div class="space-y-3">
+                <label class="block text-sm font-bold text-slate-300 uppercase tracking-widest">Duygu Durumu</label>
+                <div class="flex gap-4">
+                    {% for mood in [('harika', '🌟', 'Harika'), ('iyi', '💜', 'İyi'), ('orta', '🔵', 'Orta'), ('kotu', '🔴', 'Kötü')] %}
+                    <label class="flex-1 cursor-pointer group">
+                        <input type="radio" name="editDuygu" value="{{ mood[0] }}" class="hidden peer" data-mood="{{ mood[0] }}">
+                        <div class="flex flex-col items-center gap-2 p-4 rounded-2xl border-2 border-slate-800 bg-slate-900 peer-checked:border-violet-500 peer-checked:bg-violet-500/10 transition-all hover:border-slate-700">
+                            <span class="text-3xl grayscale group-hover:grayscale-0 peer-checked:grayscale-0 transition-all">{{ mood[1] }}</span>
+                            <span class="text-xs font-bold text-slate-500 peer-checked:text-violet-400">{{ mood[2] }}</span>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- İÇERİK ALANI -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2 text-slate-300 uppercase tracking-widest">İçerik</label>
+                <div class="editor-container">
+                    <textarea name="editIcerik" id="editor_edit_daily" rows="10"></textarea>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex justify-end gap-4 pt-6 border-t border-slate-800 mt-6 sticky bottom-0 bg-slate-900 pb-2">
+                <button type="button" onclick="closeEditDailyModal()" class="px-6 py-3 text-slate-400 hover:text-white font-bold transition-all">Vazgeç</button>
+                <button type="submit" class="px-12 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-105">
+                    Güncelle
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Yearly Modal -->
+<div id="edit-yearly-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[95vh]">
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+            <h3 class="text-xl font-bold text-white">Yıllık Kaydı Düzenle</h3>
+            <button onclick="closeEditYearlyModal()" class="text-slate-400 hover:text-white transition-colors">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+        
+        <form id="editYearlyForm" class="p-6 space-y-6 overflow-y-auto flex-grow" onsubmit="submitEditYearlyForm(event)">
+            <input type="hidden" id="editYearlyId">
+
+            <!-- Başlık Alanı -->
+            <div class="space-y-2">
+                <label class="block text-sm font-bold text-slate-300 uppercase tracking-widest">Başlık</label>
+                <input type="text" id="editYearlyBaslik" required class="w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-xl text-white focus:border-violet-500 outline-none transition-all">
+            </div>
+
+            <!-- İÇERİK ALANI -->
+            <div class="mb-6">
+                <label class="block text-sm font-bold mb-2 text-slate-300 uppercase tracking-widest">İçerik</label>
+                <div class="editor-container">
+                    <textarea name="editIcerik" id="editor_edit_yearly" rows="10"></textarea>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="flex justify-end gap-4 pt-6 border-t border-slate-800 mt-6 sticky bottom-0 bg-slate-900 pb-2">
+                <button type="button" onclick="closeEditYearlyModal()" class="px-6 py-3 text-slate-400 hover:text-white font-bold transition-all">Vazgeç</button>
+                <button type="submit" class="px-12 py-3 bg-violet-600 hover:bg-violet-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-violet-500/20 transform hover:scale-105">
+                    Güncelle
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script src="https://cdn.ckeditor.com/ckeditor5/38.0.1/classic/ckeditor.js"></script>
 <script>
-    let diaryEditor;
+    let diaryEditor, editDailyEditor, editYearlyEditor;
     
     document.addEventListener("DOMContentLoaded", function() {
         ClassicEditor
@@ -184,7 +281,29 @@
             })
             .then(editor => {
                 diaryEditor = editor;
-                console.log('Editör başarıyla yüklendi');
+                console.log('Ana editör başarıyla yüklendi');
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        ClassicEditor
+            .create(document.querySelector('#editor_edit_daily'), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ]
+            })
+            .then(editor => {
+                editDailyEditor = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        ClassicEditor
+            .create(document.querySelector('#editor_edit_yearly'), {
+                toolbar: [ 'heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote' ]
+            })
+            .then(editor => {
+                editYearlyEditor = editor;
             })
             .catch(error => {
                 console.error(error);
@@ -200,6 +319,89 @@
     
     function closeModal() {
         document.getElementById('add-modal').classList.add('hidden');
+    }
+
+    function openEditDailyModal(id, baslik, icerik, duygu) {
+        document.getElementById('editDailyId').value = id;
+        document.getElementById('editDailyBaslik').value = baslik;
+        document.getElementById('edit-daily-modal').classList.remove('hidden');
+        
+        if (editDailyEditor) {
+            editDailyEditor.setData(icerik);
+            editDailyEditor.editing.view.focus();
+        }
+
+        document.querySelectorAll('input[name="editDuygu"]').forEach(radio => {
+            if (radio.value === duygu) {
+                radio.checked = true;
+            }
+        });
+    }
+
+    function closeEditDailyModal() {
+        document.getElementById('edit-daily-modal').classList.add('hidden');
+    }
+
+    function openEditYearlyModal(id, baslik, icerik) {
+        document.getElementById('editYearlyId').value = id;
+        document.getElementById('editYearlyBaslik').value = baslik;
+        document.getElementById('edit-yearly-modal').classList.remove('hidden');
+        
+        if (editYearlyEditor) {
+            editYearlyEditor.setData(icerik);
+            editYearlyEditor.editing.view.focus();
+        }
+    }
+
+    function closeEditYearlyModal() {
+        document.getElementById('edit-yearly-modal').classList.add('hidden');
+    }
+
+    function submitEditDailyForm(event) {
+        event.preventDefault();
+        const id = document.getElementById('editDailyId').value;
+        const baslik = document.getElementById('editDailyBaslik').value;
+        const icerik = editDailyEditor.getData();
+        const duygu = document.querySelector('input[name="editDuygu"]:checked')?.value || '';
+
+        const data = { baslik, icerik, duygu };
+
+        fetch(`/admin/diaries/update/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                closeEditDailyModal();
+                setTimeout(() => location.reload(), 300);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function submitEditYearlyForm(event) {
+        event.preventDefault();
+        const id = document.getElementById('editYearlyId').value;
+        const baslik = document.getElementById('editYearlyBaslik').value;
+        const icerik = editYearlyEditor.getData();
+
+        const data = { baslik, icerik };
+
+        fetch(`/admin/diaries/update/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                closeEditYearlyModal();
+                setTimeout(() => location.reload(), 300);
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 
     function toggleEmotion(show) {
