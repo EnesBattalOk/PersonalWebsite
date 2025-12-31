@@ -308,6 +308,66 @@ def create_app():
         flash('İşlem silindi.', 'success')
         return redirect(url_for('admin_finance'))
 
+    @app.route('/admin/planner')
+    @login_required
+    def admin_planner():
+        from datetime import timedelta
+        bugun = date.today()
+        gunluk_plan = Gorev.query.filter(func.date(Gorev.son_tarih) == bugun, Gorev.kategori == 'GOREV').order_by(Gorev.saat).all()
+        gunun_onemlileri = Gorev.query.filter(func.date(Gorev.son_tarih) == bugun, Gorev.onemli_mi == True).all()
+        hafta_basla = bugun - timedelta(days=bugun.weekday())
+        hafta_sonu = hafta_basla + timedelta(days=6)
+        haftalik_gorevler = Gorev.query.filter(Gorev.son_tarih.isnot(None), func.date(Gorev.son_tarih) >= hafta_basla, func.date(Gorev.son_tarih) <= hafta_sonu).all()
+        haftalik_plan = {'Pazartesi': [], 'Salı': [], 'Çarşamba': [], 'Perşembe': [], 'Cuma': [], 'Cumartesi': [], 'Pazar': []}
+        gun_map = {0: 'Pazartesi', 1: 'Salı', 2: 'Çarşamba', 3: 'Perşembe', 4: 'Cuma', 5: 'Cumartesi', 6: 'Pazar'}
+        for gorev in haftalik_gorevler:
+            if gorev.son_tarih:
+                gun_index = gorev.son_tarih.date().weekday()
+                gun_adi = gun_map.get(gun_index)
+                if gun_adi: haftalik_plan[gun_adi].append(gorev)
+        tum_gorevler = Gorev.query.all()
+        yillik_hedefler = Gorev.query.filter_by(kategori='HEDEF').all()
+        return render_template('admin_planner.html', gunluk_plan=gunluk_plan, gunun_onemlileri=gunun_onemlileri, haftalik_plan=haftalik_plan, tum_gorevler=tum_gorevler, yillik_hedefler=yillik_hedefler)
+
+    @app.route('/admin/planner/add', methods=['POST'])
+    @login_required
+    def add_planner_task():
+        baslik = request.form.get('baslik')
+        aciklama = request.form.get('aciklama')
+        oncelik = request.form.get('oncelik')
+        son_tarih_str = request.form.get('son_tarih')
+        saat = request.form.get('saat')
+        kategori = request.form.get('kategori', 'GOREV')
+        ceyrek = request.form.get('ceyrek')
+        onemli_mi = 'onemli_mi' in request.form
+        son_tarih = datetime.strptime(son_tarih_str, '%Y-%m-%d') if son_tarih_str else None
+        ceyrek_int = int(ceyrek) if ceyrek and ceyrek.isdigit() else None
+        yeni_gorev = Gorev(baslik=baslik, aciklama=aciklama, oncelik=oncelik, son_tarih=son_tarih, saat=saat, kategori=kategori, ceyrek=ceyrek_int, onemli_mi=onemli_mi)
+        db.session.add(yeni_gorev)
+        db.session.commit()
+        flash('Görev başarıyla eklendi.', 'success')
+        return redirect(url_for('admin_planner'))
+
+    @app.route('/admin/planner/update_status/<int:id>', methods=['POST'])
+    @login_required
+    def update_task_status(id):
+        data = request.get_json()
+        gorev = Gorev.query.get_or_404(id)
+        if data and 'yeni_durum' in data:
+            gorev.durum = data['yeni_durum']
+            db.session.commit()
+            return jsonify({'success': True})
+        return jsonify({'success': False}), 400
+
+    @app.route('/admin/planner/delete/<int:id>')
+    @login_required
+    def delete_planner_task(id):
+        gorev = Gorev.query.get_or_404(id)
+        db.session.delete(gorev)
+        db.session.commit()
+        flash('Görev silindi.', 'success')
+        return redirect(url_for('admin_planner'))
+
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
     def admin_skills():
