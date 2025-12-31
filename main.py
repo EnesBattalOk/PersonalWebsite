@@ -228,6 +228,86 @@ def create_app():
             return redirect(url_for('admin_projects'))
         return render_template('admin_projects.html', projeler=Proje.query.all())
 
+    @app.route('/admin/finance')
+    @login_required
+    def admin_finance():
+        # Başlangıç Envanteri
+        varliklar = {
+            'ALTIN': {'toplam': 0.0, 'fiziksel': 0.0, 'banka': 0.0},
+            'GUMUS': {'toplam': 0.0, 'fiziksel': 0.0, 'banka': 0.0},
+            'USD': {'toplam': 0.0, 'fiziksel': 0.0, 'banka': 0.0},
+            'EUR': {'toplam': 0.0, 'fiziksel': 0.0, 'banka': 0.0},
+            'NAKIT': {'toplam': 0.0, 'fiziksel': 0.0, 'banka': 0.0}
+        }
+
+        tum_islemler = FinansIslem.query.all()
+        
+        for islem in tum_islemler:
+            if islem.islem_turu == 'GELIR':
+                varliklar['NAKIT']['toplam'] += islem.tutar_tl
+                varliklar['NAKIT']['fiziksel'] += islem.tutar_tl
+            elif islem.islem_turu == 'GIDER':
+                varliklar['NAKIT']['toplam'] -= islem.tutar_tl
+                varliklar['NAKIT']['fiziksel'] -= islem.tutar_tl
+            elif islem.islem_turu in ['VARLIK_ALIM', 'VARLIK_SATIM']:
+                carpan = 1 if islem.islem_turu == 'VARLIK_ALIM' else -1
+                varliklar['NAKIT']['toplam'] -= (islem.tutar_tl * carpan)
+                varliklar['NAKIT']['fiziksel'] -= (islem.tutar_tl * carpan)
+                v_turu = islem.doviz_turu or islem.kategori
+                if v_turu in varliklar:
+                    miktar = islem.miktar
+                    varliklar[v_turu]['toplam'] += (miktar * carpan)
+                    if islem.varlik_konumu == 'BANKA':
+                        varliklar[v_turu]['banka'] += (miktar * carpan)
+                    else:
+                        varliklar[v_turu]['fiziksel'] += (miktar * carpan)
+
+        canli_kurlar = get_live_rates()
+        net_servet = varliklar['NAKIT']['toplam']
+        net_servet += varliklar['ALTIN']['toplam'] * canli_kurlar['ALTIN']
+        net_servet += varliklar['GUMUS']['toplam'] * canli_kurlar['GUMUS']
+        net_servet += varliklar['USD']['toplam'] * canli_kurlar['USD']
+        net_servet += varliklar['EUR']['toplam'] * canli_kurlar['EUR']
+
+        islemler = FinansIslem.query.order_by(FinansIslem.tarih.desc()).limit(20).all()
+        return render_template('admin_finance.html', varliklar=varliklar, net_servet=net_servet, canli_kurlar=canli_kurlar, islemler=islemler)
+
+    @app.route('/admin/finance/add', methods=['POST'])
+    @login_required
+    def add_finance_item():
+        islem_turu = request.form.get('islem_turu')
+        if islem_turu in ['GELIR', 'GIDER']:
+            tutar_tl = float(request.form.get('tutar_tl') or 0)
+            kategori = request.form.get('kategori', 'NAKIT')
+            miktar = 0
+            banka_adi = None
+            varlik_konumu = 'FIZIKSEL'
+            doviz_turu = 'NAKIT'
+        else:
+            tutar_tl = float(request.form.get('v_tutar_tl') or 0)
+            kategori = request.form.get('doviz_turu')
+            miktar = float(request.form.get('miktar') or 0)
+            banka_adi = request.form.get('banka')
+            varlik_konumu = request.form.get('varlik_konumu', 'FIZIKSEL')
+            doviz_turu = request.form.get('doviz_turu')
+
+        aciklama = request.form.get('aciklama')
+        birim_fiyat = tutar_tl / miktar if miktar > 0 else 0
+        yeni_islem = FinansIslem(islem_turu=islem_turu, kategori=kategori, tutar_tl=tutar_tl, miktar=miktar, banka_adi=banka_adi, varlik_konumu=varlik_konumu, birim_fiyat=birim_fiyat, doviz_turu=doviz_turu, aciklama=aciklama)
+        db.session.add(yeni_islem)
+        db.session.commit()
+        flash('Finansal işlem başarıyla kaydedildi.', 'success')
+        return redirect(url_for('admin_finance'))
+
+    @app.route('/admin/finance/delete/<int:id>')
+    @login_required
+    def delete_finance_item(id):
+        islem = FinansIslem.query.get_or_404(id)
+        db.session.delete(islem)
+        db.session.commit()
+        flash('İşlem silindi.', 'success')
+        return redirect(url_for('admin_finance'))
+
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
     def admin_skills():
