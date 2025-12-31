@@ -482,6 +482,60 @@ def create_app():
         flash('Proje başlatıldı.', 'success')
         return redirect(url_for('admin_ideas'))
 
+    @app.route('/admin/studio')
+    @login_required
+    def admin_studio():
+        projeler = StudioProject.query.order_by(StudioProject.olusturma_tarihi.desc()).all()
+        return render_template('admin_studio.html', projeler=projeler)
+
+    @app.route('/admin/studio/add', methods=['POST'])
+    @login_required
+    def add_studio_project():
+        yeni_proje = StudioProject(name=request.form.get('name'), category=request.form.get('category'), secure_data=request.form.get('secure_data'))
+        db.session.add(yeni_proje)
+        db.session.commit()
+        flash('Studio projesi eklendi.', 'success')
+        return redirect(url_for('admin_studio'))
+
+    @app.route('/admin/studio/log/<int:id>', methods=['POST'])
+    @login_required
+    def add_studio_log(id):
+        yeni_log = StudioWorkLog(proje_id=id, note=request.form.get('note'))
+        db.session.add(yeni_log)
+        db.session.commit()
+        flash('Çalışma notu eklendi.', 'success')
+        return redirect(url_for('admin_studio'))
+
+    @app.route('/admin/studio/delete/<int:id>')
+    @login_required
+    def delete_studio_project(id):
+        proje = StudioProject.query.get_or_404(id)
+        db.session.delete(proje)
+        db.session.commit()
+        flash('Proje silindi.', 'success')
+        return redirect(url_for('admin_studio'))
+
+    @app.route('/admin/skill/edit/<int:id>', methods=['GET', 'POST'])
+    @login_required
+    def edit_skill(id):
+        yetenek = Yetenek.query.get_or_404(id)
+        if request.method == 'POST':
+            yetenek.ad = request.form.get('ad')
+            yetenek.yuzde = int(request.form.get('yuzde'))
+            db.session.commit()
+            flash('Yetenek güncellendi.', 'success')
+            return redirect(url_for('admin_skills'))
+        return render_template('admin_skill_edit.html', yetenek=yetenek)
+
+    @app.route('/admin/skill/delete/<int:id>')
+    @login_required
+    def delete_skill(id):
+        yetenek = Yetenek.query.get_or_404(id)
+        db.session.delete(yetenek)
+        db.session.commit()
+        flash('Yetenek silindi.', 'success')
+        return redirect(url_for('admin_skills'))
+
     @app.route('/admin/skills', methods=['GET', 'POST'])
     @login_required
     def admin_skills():
