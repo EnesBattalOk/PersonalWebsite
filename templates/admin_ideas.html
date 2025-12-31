@@ -842,27 +842,14 @@
 
     // Proje Haritası Modal (Dikey Roadmap Görünüm)
     function openProjectMap(projectId, projectTitle) {
-        const allTasks = [];
-        const phaseElements = document.querySelectorAll(`[data-project-id="${projectId}"]`);
-        
-        // Tüm görevleri topla
-        phaseElements.forEach(column => {
-            const status = column.dataset.status;
-            column.querySelectorAll('[data-task-id]').forEach(task => {
-                const taskTitle = task.querySelector('p').textContent;
-                const taskPhase = task.querySelector('.text-xs')?.textContent || 'Bilinmeyen Faz';
-                allTasks.push({ title: taskTitle, phase: taskPhase, status: status });
-            });
-        });
-        
-        // Fazları grupla
-        const phaseMap = {};
-        allTasks.forEach(task => {
-            if (!phaseMap[task.phase]) {
-                phaseMap[task.phase] = [];
-            }
-            phaseMap[task.phase].push(task);
-        });
+        // Backend'ten tüm fazları getir
+        fetch(`/admin/ideas/project_roadmap/${projectId}`)
+            .then(r => r.json())
+            .then(data => buildProjectRoadmap(data.fazlar, projectTitle))
+            .catch(e => console.error('Hata:', e));
+    }
+    
+    function buildProjectRoadmap(phaseMap, projectTitle) {
         
         let modal = document.getElementById('projectMapModal');
         if (!modal) {
@@ -911,16 +898,22 @@
                 <div class="roadmap-container">
         `;
         
-        // Hazırlanmış tüm görevleri say
+        // Tamamlanan faz sayısını hesapla
         let completedCount = 0;
         let activePhaseSet = false;
         
-        Object.entries(phaseMap).forEach(([phaseName, tasks], index) => {
-            const phaseCompleted = tasks.every(t => t.status === 'BITTI');
-            const phaseActive = tasks.some(t => t.status === 'SURUYOR');
-            const isActive = phaseActive && !activePhaseSet;
+        Object.entries(phaseMap).forEach(([phaseName, tasks]) => {
+            const phaseCompleted = tasks.every(t => t.durum === 'BITTI');
+            const phaseActive = tasks.some(t => t.durum === 'SURUYOR');
             
             if (phaseCompleted) completedCount++;
+        });
+        
+        Object.entries(phaseMap).forEach(([phaseName, tasks]) => {
+            const phaseCompleted = tasks.every(t => t.durum === 'BITTI');
+            const phaseActive = tasks.some(t => t.durum === 'SURUYOR');
+            const isActive = phaseActive && !activePhaseSet;
+            
             if (isActive) activePhaseSet = true;
             
             const phaseClass = phaseCompleted ? 'completed' : isActive ? 'active' : '';
@@ -934,9 +927,9 @@
             `;
             
             tasks.forEach(task => {
-                const taskStatus = task.status === 'BITTI' ? 'completed' : task.status === 'SURUYOR' ? 'active' : '';
-                const icon = task.status === 'BITTI' ? '✅' : task.status === 'SURUYOR' ? '⚙️' : '📋';
-                content += `<li class="${taskStatus}"><span>${icon}</span> ${task.title}</li>`;
+                const taskStatus = task.durum === 'BITTI' ? 'completed' : task.durum === 'SURUYOR' ? 'active' : '';
+                const icon = task.durum === 'BITTI' ? '✅' : task.durum === 'SURUYOR' ? '⚙️' : '📋';
+                content += `<li class="${taskStatus}"><span>${icon}</span> ${task.baslik}</li>`;
             });
             
             content += `
@@ -951,7 +944,7 @@
                 </div>
                 <div style="margin-top:30px; padding:15px; background:#1e293b; border-radius:8px; border-left:4px solid #8b5cf6;">
                     <p style="color:#cbd5e1; margin:0; font-size:13px;">
-                        <strong>İlerleme:</strong> ${completedCount} / ${Object.entries(phaseMap).length} faz tamamlandı
+                        <strong>İlerleme:</strong> ${completedCount} / ${Object.keys(phaseMap).length} faz tamamlandı
                     </p>
                 </div>
             </div>

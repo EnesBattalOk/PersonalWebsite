@@ -904,6 +904,29 @@ def create_app():
         
         return jsonify({'success': False, 'error': 'Geçersiz durum'}), 400
 
+    @app.route('/admin/ideas/project_roadmap/<int:project_id>')
+    @login_required
+    def project_roadmap(project_id):
+        """Proje'nin tüm fazlarını ve görevlerini getir"""
+        proje = ProjeFikri.query.get_or_404(project_id)
+        gorevler = ProjeGorev.query.filter_by(proje_id=project_id).order_by(ProjeGorev.faz, ProjeGorev.sira, ProjeGorev.id).all()
+        
+        # Fazlara göre grupla
+        fazlar = {}
+        for gorev in gorevler:
+            faz_adi = gorev.faz or 'Bilinmeyen Faz'
+            if faz_adi not in fazlar:
+                fazlar[faz_adi] = []
+            fazlar[faz_adi].append({
+                'baslik': gorev.baslik,
+                'durum': gorev.durum
+            })
+        
+        return jsonify({
+            'baslik': proje.baslik,
+            'fazlar': fazlar
+        })
+
     @app.route('/proje/<int:id>')
     def project_detail(id):
         proje = Proje.query.get_or_404(id)
