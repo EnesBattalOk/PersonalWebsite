@@ -205,6 +205,12 @@ def create_app():
         mesajlar = Mesaj.query.order_by(Mesaj.tarih.desc()).all()
         return render_template('admin_inbox.html', mesajlar=mesajlar)
 
+    @app.route('/project/<int:id>')
+    def project_detail(id):
+        admin = Kullanici.query.first()
+        proje = Proje.query.get_or_404(id)
+        return render_template('project_detail.html', admin=admin, proje=proje)
+
     @app.route('/admin/projects', methods=['GET', 'POST'])
     @login_required
     def admin_projects():
